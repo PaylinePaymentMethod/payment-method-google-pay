@@ -127,3 +127,22 @@ task testJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
 }
 
 test.exclude '**/*IT.class'
+    filter ReplaceTokens, tokens: [
+            "version": project.version.replace("-SNAPSHOT", ""),
+            "date": new Date().format("dd/MM/yyyy")
+    ]
+}
+
+test.exclude '**/*IT.class'
+
+sonarqube {
+    properties {
+        property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/test.exec"
+        property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
+        property 'sonar.dependencyCheck.htmlReportPath', "${project.buildDir}/reports/dependency-check-report.html"
+
+        property 'sonar.organization', 'thales-META-INF.services-monext'
+        property 'sonar.host.url', 'https://sonarcloud.io'
+
+    }
+}
