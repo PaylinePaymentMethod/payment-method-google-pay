@@ -19,7 +19,7 @@ import java.util.*;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
 
-    private static final Logger logger = LogManager.getLogger( ConfigurationServiceImpl.class );
+    private static final Logger LOGGER = LogManager.getLogger( ConfigurationServiceImpl.class );
 
     private I18nService i18n = I18nService.getInstance();
 
@@ -71,19 +71,19 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public ReleaseInformation getReleaseInformation() {
-        Properties props = new Properties();
+        final Properties props = new Properties();
         try {
-            props.load( ConfigurationServiceImpl.class.getClassLoader().getResourceAsStream( RELEASE_PROPERTIES ) );
-        } catch( IOException e ){
-            this.logger.error("An error occurred reading the file: " + RELEASE_PROPERTIES );
-            props.setProperty( RELEASE_VERSION, "unknown" );
-            props.setProperty( RELEASE_DATE, "01/01/1900" );
+            props.load(ConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(RELEASE_PROPERTIES));
+        } catch (IOException e) {
+            final String message = "An error occurred reading the file: release.properties";
+            LOGGER.error(message);
+            throw new RuntimeException(message, e);
         }
 
-        LocalDate date = LocalDate.parse( props.getProperty( RELEASE_DATE ), DateTimeFormatter.ofPattern( RELEASE_DATE_FORMAT ) );
+        final LocalDate date = LocalDate.parse(props.getProperty(RELEASE_DATE), DateTimeFormatter.ofPattern(RELEASE_DATE_FORMAT));
         return ReleaseInformation.ReleaseBuilder.aRelease()
-                .withDate( date )
-                .withVersion( props.getProperty( RELEASE_VERSION ) )
+                .withDate(date)
+                .withVersion(props.getProperty(RELEASE_VERSION))
                 .build();
     }
 
