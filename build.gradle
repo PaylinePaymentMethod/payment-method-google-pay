@@ -1,4 +1,4 @@
-import org.apache.tools.ant.filters.ReplaceTokens
+import org.apache.tools.ant.filters.*
 
 plugins {
     id "com.github.johnrengelman.shadow" version "2.0.1"
@@ -121,7 +121,7 @@ processResources {
 processResources {
     filter ReplaceTokens, tokens: [
             "version": project.version.replace("-SNAPSHOT", ""),
-            "date"   : new Date().format("dd/MM/yyyy")
+            "date": new Date().format("dd/MM/yyyy")
     ]
 }
 
