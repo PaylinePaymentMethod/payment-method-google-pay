@@ -11,12 +11,16 @@ import com.payline.pmapi.bean.paymentform.request.PaymentFormLogoRequest;
 import com.payline.pmapi.bean.paymentform.response.configuration.PaymentFormConfigurationResponse;
 import com.payline.pmapi.bean.paymentform.response.configuration.impl.PaymentFormConfigurationResponseSpecific;
 import com.payline.pmapi.bean.paymentform.response.logo.PaymentFormLogoResponse;
+import com.payline.pmapi.bean.paymentform.response.logo.impl.PaymentFormLogoResponseFile;
 import com.payline.pmapi.service.PaymentFormConfigurationService;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,7 +30,11 @@ import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
 public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigurationService {
 
-    private static final Logger logger = LogManager.getLogger( PaymentFormConfigurationServiceImpl.class );
+    private static final String LOGO_CONTENT_TYPE = "image/png";
+    private static final int LOGO_HEIGHT = 256;
+    private static final int LOGO_WIDTH = 256;
+
+    private static final Logger LOGGER = LogManager.getLogger( PaymentFormConfigurationServiceImpl.class );
 
     @Override
     public PaymentFormConfigurationResponse getPaymentFormConfiguration(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
@@ -68,6 +76,8 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
                 .withContainer(partnerWidgetContainerTargetDivId)
                 // La callback de retour Payline pour proceder a la payment request qui devra suivre
                 .withOnPay(partnerWidgetOnPayCallBack)
+                .withDescription("DESC") //TODO description obligatoire a ajouter
+                .withDisplayButton(true).withButtonText("HACK") //TODO ligne temporaire le temps qu'un bug du widget soit corrige
                 .build();
 
         return PaymentFormConfigurationResponseSpecific
@@ -80,12 +90,34 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
 
     @Override
     public PaymentFormLogoResponse getPaymentFormLogo(PaymentFormLogoRequest paymentFormLogoRequest) {
-        return null;
+        return PaymentFormLogoResponseFile.PaymentFormLogoResponseFileBuilder.aPaymentFormLogoResponseFile()
+                .withHeight(LOGO_HEIGHT)
+                .withWidth(LOGO_WIDTH)
+                .withTitle("Title") //TODO
+                .withAlt("Alt") //TODO
+                .build();
     }
 
     @Override
-    public PaymentFormLogo getLogo(String s, Locale locale) {
-        return null;
+    public PaymentFormLogo getLogo(String paymentMethodIdentifier, Locale locale) {
+        try {
+            // Read logo file
+            InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("logo.png");
+            BufferedImage logo = ImageIO.read(input);
+
+            // Recover byte array from image
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(logo, "png", baos);
+
+            return PaymentFormLogo.PaymentFormLogoBuilder.aPaymentFormLogo()
+                    .withFile(baos.toByteArray())
+                    .withContentType(LOGO_CONTENT_TYPE)
+                    .build();
+
+        } catch (IOException e) {
+            LOGGER.error("unable to load the logo: {}", e.getMessage(), e);
+            throw new RuntimeException("Unable to load logo");
+        }
     }
 
     /**
@@ -101,7 +133,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
             url = new URL(JS_URL_GOOGLE_PAY);
 
         } catch (MalformedURLException e) {
-            this.logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
 
         return url;
@@ -114,8 +146,8 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
      */
     private String getInitPaymentJavaScript() {
 
-        String rawScriptInitPaymentContent = StringUtils.EMPTY;
-        String scriptInitPaymentContent = StringUtils.EMPTY;
+        String rawScriptInitPaymentContent = "";
+        String scriptInitPaymentContent = "";
 
         try {
 
@@ -126,7 +158,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
             );
 
         } catch (IOException e) {
-            this.logger.error(e.getMessage());
+            LOGGER.error(e.getMessage()); //TODO mieux gerer cette erreur qui doit etre bloquante non ?
         }
 
         scriptInitPaymentContent = rawScriptInitPaymentContent
@@ -136,7 +168,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
                 .replace(JS_PARAM_TAG__CONTAINER, JS_PARAM_VALUE__CONTAINER)
                 .replace(JS_PARAM_TAG__CALLBACK, JS_PARAM_VALUE__CALLBACK);
 
-        this.logger.debug(scriptInitPaymentContent);
+        LOGGER.debug(scriptInitPaymentContent);
 
         return scriptInitPaymentContent;
 
