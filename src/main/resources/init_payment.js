@@ -111,8 +111,8 @@ function getGooglePaymentDataRequest() {
   paymentDataRequest.merchantInfo = {
     // @todo a merchant ID is available for a production environment after approval by Google
     // See {@link https://developers.google.com/pay/api/web/guides/test-and-deploy/integration-checklist|Integration checklist}
-    // merchantId: '01234567890123456789',
-    merchantName: 'Example Merchant'
+     merchantId: '${merchantId}',
+    merchantName: '${merchantName}'
   };
   return paymentDataRequest;
 }
@@ -125,7 +125,7 @@ function getGooglePaymentDataRequest() {
  */
 function getGooglePaymentsClient() {
   if ( paymentsClient === null ) {
-    paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
+    paymentsClient = new google.payments.api.PaymentsClient({environment: '${environement}'});
   }
   return paymentsClient;
 }
@@ -161,7 +161,12 @@ function onGooglePayLoaded() {
 function addGooglePayButton() {
   const paymentsClient = getGooglePaymentsClient();
   const button =
-      paymentsClient.createButton({onClick: onGooglePaymentButtonClicked});
+      paymentsClient.createButton(
+      {
+        buttonColor: "${buttonColor}",
+        buttonType: "${buttonType}"
+        onClick: onGooglePaymentButtonClicked
+      });
   document.getElementById('${container}').appendChild(button);
 }
 
@@ -173,10 +178,10 @@ function addGooglePayButton() {
  */
 function getGoogleTransactionInfo() {
   return {
-    currencyCode: 'USD',
+    currencyCode: '${currency}',
     totalPriceStatus: 'FINAL',
     // set to cart total
-    totalPrice: '1.00'
+    totalPrice: '${totalPrice}'
   };
 }
 
@@ -190,7 +195,7 @@ function prefetchGooglePaymentData() {
   // transactionInfo must be set but does not affect cache
   paymentDataRequest.transactionInfo = {
     totalPriceStatus: 'NOT_CURRENTLY_KNOWN',
-    currencyCode: 'USD'
+    currencyCode: '${totalPrice}'
   };
   const paymentsClient = getGooglePaymentsClient();
   paymentsClient.prefetchPaymentData(paymentDataRequest);
@@ -223,7 +228,7 @@ function onGooglePaymentButtonClicked() {
  */
 function processPayment(paymentData) {
   // show returned data in developer console for debugging
-  console.log(paymentData);
+  console.log(paymentData); // todo enlever cette ligne!
   // pass payment data response to your gateway to process payment
   ${callback}(paymentData);
 }

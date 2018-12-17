@@ -1,6 +1,5 @@
 package com.payline.payment.google.pay.service.impl;
 
-import com.google.common.io.CharStreams;
 import com.payline.pmapi.bean.paymentform.bean.PaymentFormLogo;
 import com.payline.pmapi.bean.paymentform.bean.form.PartnerWidgetForm;
 import com.payline.pmapi.bean.paymentform.bean.form.partnerwidget.PartnerWidgetContainerTargetDivId;
@@ -19,11 +18,12 @@ import org.apache.logging.log4j.Logger;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Locale;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
@@ -34,13 +34,13 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
     private static final int LOGO_HEIGHT = 256;
     private static final int LOGO_WIDTH = 256;
 
-    private static final Logger LOGGER = LogManager.getLogger( PaymentFormConfigurationServiceImpl.class );
+    private static final Logger LOGGER = LogManager.getLogger(PaymentFormConfigurationServiceImpl.class);
 
     @Override
     public PaymentFormConfigurationResponse getPaymentFormConfiguration(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
 
         URL googlePayScriptUrl = this.getGooglePayScriptUrl();
-        String scriptInitPaymentContent = this.getInitPaymentJavaScript();
+        String scriptInitPaymentContent = this.getInitPaymentJavaScript(paymentFormConfigurationRequest);
 
         // Define the JS script to load
         PartnerWidgetScriptImport partnerWidgetScriptImport = PartnerWidgetScriptImport
@@ -53,14 +53,14 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
         PartnerWidgetOnPayCallBack partnerWidgetOnPayCallBack = PartnerWidgetOnPayCallBack
                 .WidgetContainerOnPayCallBackBuilder
                 .aWidgetContainerOnPayCallBack()
-                .withName(JS_PARAM_VALUE__CALLBACK)
+                .withName(JS_PARAM_VALUE_CALLBACK)
                 .build();
 
         // Define the GooglePay button target div id
         PartnerWidgetContainerTargetDivId partnerWidgetContainerTargetDivId = PartnerWidgetContainerTargetDivId
                 .WidgetPartnerContainerTargetDivIdBuilder
                 .aWidgetPartnerContainerTargetDivId()
-                .withId(JS_PARAM_VALUE__CONTAINER)
+                .withId(JS_PARAM_VALUE_CONTAINER)
                 .build();
 
         PartnerWidgetForm partnerWidgetForm = PartnerWidgetForm
@@ -121,7 +121,6 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
     }
 
     /**
-     *
      * @return
      */
     private URL getGooglePayScriptUrl() {
@@ -141,32 +140,51 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
     }
 
     /**
-     *
      * @return
      */
-    private String getInitPaymentJavaScript() {
+    private String getInitPaymentJavaScript(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
 
         String rawScriptInitPaymentContent = "";
         String scriptInitPaymentContent = "";
 
-        try {
+        // get info to put in .js
+        final String merchantId = paymentFormConfigurationRequest.getContractConfiguration().getProperty(MERCHANT_ID_KEY).getValue();
+        final String merchantName = paymentFormConfigurationRequest.getContractConfiguration().getProperty(MERCHANT_NAME_KEY).getValue();
+        final String environment = paymentFormConfigurationRequest.getEnvironment().isSandbox() ? TEST : PRODUCTION;
+        final String currency = paymentFormConfigurationRequest.getAmount().getCurrency().getCurrencyCode();
+        final String price = String.valueOf(paymentFormConfigurationRequest.getAmount().getAmountInSmallestUnit());
+        final String buttonType = paymentFormConfigurationRequest.getContractConfiguration().getProperty(BUTTON_SIZE_KEY).getValue();
+        final String buttonColor = paymentFormConfigurationRequest.getContractConfiguration().getProperty(BUTTON_COLOR_KEY).getValue();
 
-            rawScriptInitPaymentContent = CharStreams.toString(
-                    new InputStreamReader(
-                            PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(JS_RES_INIT_PAYMENT)
-                    )
-            );
+        try {
+            File file = new File(this.getClass().getClassLoader().getResource(JS_RES_INIT_PAYMENT).getFile());
+            rawScriptInitPaymentContent = new String(Files.readAllBytes(file.toPath()));
+
+            scriptInitPaymentContent = rawScriptInitPaymentContent
+                    .replace(JS_PARAM_TAG_TYPE, JS_PARAM_VALUE_TYPE)
+                    .replace(JS_PARAM_TAG_GATEWAY, JS_PARAM_VALUE_GATEWAY_NAME)
+                    .replace(JS_PARAM_TAG_GATEWAY_MERCHANT_ID, "gatewayMerchantId")
+
+                    .replace(JS_PARAM_TAG_MERCHANT_ID, merchantId)
+                    .replace(JS_PARAM_TAG_MERCHANT_NAME, merchantName)
+                    .replace(JS_PARAM_TAG_ENVIRONMENT, environment)
+                    .replace(JS_PARAM_TAG_CURRENCY, currency)
+                    .replace(JS_PARAM_TAG_PRICE, price) // fixme ex 1.00 verifier qu'on a bien le bon format
+
+                    .replace(JS_PARAM_TAG_BTN_TYPE, buttonType)
+                    .replace(JS_PARAM_TAG_BTN_COLOR, buttonColor)
+
+                    .replace(JS_PARAM_TAG_CONTAINER, JS_PARAM_VALUE_CONTAINER)
+                    .replace(JS_PARAM_TAG_CALLBACK, JS_PARAM_VALUE_CALLBACK);
 
         } catch (IOException e) {
-            this.LOGGER.error(e.getMessage()); //TODO mieux gerer cette erreur qui doit etre bloquante non ?
+            LOGGER.error(e.getMessage());
+            // todo lever une exception ????Runtime????
         }
 
-        scriptInitPaymentContent = rawScriptInitPaymentContent
-                .replace(JS_PARAM_TAG__TYPE, JS_PARAM_VALUE__TYPE)
-                .replace(JS_PARAM_TAG__GATEWAY, JS_PARAM_VALUE__GATEWAY_NAME)
-                .replace(JS_PARAM_TAG__GATEWAY_MERCHAND_ID, "gatewayMerchantId")
-                .replace(JS_PARAM_TAG__CONTAINER, JS_PARAM_VALUE__CONTAINER)
-                .replace(JS_PARAM_TAG__CALLBACK, JS_PARAM_VALUE__CALLBACK);
+
+        // todo remplacer aussi   le totalPriceStatus(192)
+        // todo apres remplacer allowedCardNetWork(l18) & allowedCard
 
         this.LOGGER.debug(scriptInitPaymentContent);
 

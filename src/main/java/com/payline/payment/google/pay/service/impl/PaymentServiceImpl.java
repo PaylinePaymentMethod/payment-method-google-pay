@@ -19,20 +19,20 @@ import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
 public class PaymentServiceImpl implements PaymentService {
 
-    private static final Logger logger = LogManager.getLogger( PaymentServiceImpl.class );
+    private static final Logger LOGGER = LogManager.getLogger( PaymentServiceImpl.class );
 
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
 
         String jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
-        this.logger.debug("JSON PaymentData :");
-        this.logger.debug(jsonPaymentData);
+        LOGGER.debug("JSON PaymentData :");
+        LOGGER.debug(jsonPaymentData);
 
         PaymentData paymentData = new PaymentData.Builder().fromJson(jsonPaymentData);
-        this.logger.debug("Object PaymentData :");
-        this.logger.debug(paymentData.toString());
+        LOGGER.debug("Object PaymentData :");
+        LOGGER.debug(paymentData.toString());
 
-        this.logger.debug("Encrypted token : " + paymentData.getPaymentMethodData().getTokenizationData().getToken());
+        LOGGER.debug("Encrypted token : " + paymentData.getPaymentMethodData().getTokenizationData().getToken());
 
 
         GooglePaymentsPublicKeysManager googlePaymentsPublicKeysManager = GooglePaymentsPublicKeysManager.INSTANCE_TEST;
@@ -45,12 +45,12 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentData.getPaymentMethodData().getTokenizationData().getToken(),
                 googlePaymentsPublicKeysManager
         );
-        this.logger.debug("JSON decrypted token :");
-        this.logger.debug(jsonEncryptedPaymentData);
+        LOGGER.debug("JSON decrypted token :");
+        LOGGER.debug(jsonEncryptedPaymentData);
 
         DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
-        this.logger.debug("OBJECT decrypted token :");
-        this.logger.debug(decryptedPaymentData.toString());
+        LOGGER.debug("OBJECT decrypted token :");
+        LOGGER.debug(decryptedPaymentData.toString());
 
         Card card = Card.CardBuilder.aCard()
                 //.withBrand()

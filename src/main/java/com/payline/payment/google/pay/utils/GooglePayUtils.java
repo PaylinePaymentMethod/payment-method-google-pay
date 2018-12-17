@@ -22,7 +22,7 @@ public class GooglePayUtils {
 
             result = new PaymentMethodTokenRecipient.Builder()
                     .fetchSenderVerifyingKeysWith(googlePaymentsPublicKeysManager)
-                    .recipientId("gateway:"+JS_PARAM_VALUE__GATEWAY_NAME)
+                    .recipientId("gateway:"+ JS_PARAM_VALUE_GATEWAY_NAME)
                     // Multiple private keys can be added to support graceful key rotations.
                     .addRecipientPrivateKey(PRIVATE_KEY)
                     .build()
