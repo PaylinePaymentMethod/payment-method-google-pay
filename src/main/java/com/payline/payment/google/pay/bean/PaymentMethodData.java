@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class PaymentMethodData {
 
-    @SerializedName("type")
+
     private String type;
 
     @SerializedName("description")
@@ -16,7 +16,8 @@ public class PaymentMethodData {
     @SerializedName("tokenizationData")
     private PaymentMethodTokenizationData tokenizationData;
 
-    public PaymentMethodData() { }
+    public PaymentMethodData() {
+    }
 
     public String getType() {
         return type;
