@@ -5,7 +5,8 @@ import com.google.crypto.tink.apps.paymentmethodtoken.PaymentMethodTokenRecipien
 
 import java.security.GeneralSecurityException;
 
-import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.JS_PARAM_VALUE_GATEWAY_NAME;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.PRIVATE_KEY;
 
 public class GooglePayUtils {
 
@@ -22,7 +23,7 @@ public class GooglePayUtils {
 
             result = new PaymentMethodTokenRecipient.Builder()
                     .fetchSenderVerifyingKeysWith(googlePaymentsPublicKeysManager)
-                    .recipientId("gateway:"+ JS_PARAM_VALUE_GATEWAY_NAME)
+                    .recipientId("gateway:" + JS_PARAM_VALUE_GATEWAY_NAME)
                     // Multiple private keys can be added to support graceful key rotations.
                     .addRecipientPrivateKey(PRIVATE_KEY)
                     .build()

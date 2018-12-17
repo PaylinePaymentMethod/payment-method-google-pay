@@ -144,7 +144,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
      */
     private String getInitPaymentJavaScript(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
 
-        String rawScriptInitPaymentContent = "";
+
         String scriptInitPaymentContent = "";
 
         // get info to put in .js
@@ -158,7 +158,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
 
         try {
             File file = new File(this.getClass().getClassLoader().getResource(JS_RES_INIT_PAYMENT).getFile());
-            rawScriptInitPaymentContent = new String(Files.readAllBytes(file.toPath()));
+            String rawScriptInitPaymentContent = new String(Files.readAllBytes(file.toPath()));
 
             scriptInitPaymentContent = rawScriptInitPaymentContent
                     .replace(JS_PARAM_TAG_TYPE, JS_PARAM_VALUE_TYPE)
