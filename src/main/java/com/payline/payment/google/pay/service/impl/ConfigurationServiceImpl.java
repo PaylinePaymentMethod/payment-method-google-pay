@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+import static com.payline.payment.google.pay.utils.propertiesFilesConstants.ConfigurationConstants.*;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
 

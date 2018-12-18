@@ -1,27 +1,16 @@
 package com.payline.payment.google.pay.service.impl;
 
-import com.payline.pmapi.bean.payment.ContractProperty;
-import com.payline.pmapi.bean.paymentform.bean.PaymentFormLogo;
+import com.payline.payment.google.pay.service.ThalesPaymentFormConfigurationService;
 import com.payline.pmapi.bean.paymentform.bean.form.PartnerWidgetForm;
 import com.payline.pmapi.bean.paymentform.bean.form.partnerwidget.PartnerWidgetContainerTargetDivId;
 import com.payline.pmapi.bean.paymentform.bean.form.partnerwidget.PartnerWidgetOnPayCallBack;
 import com.payline.pmapi.bean.paymentform.bean.form.partnerwidget.PartnerWidgetScriptImport;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormConfigurationRequest;
-import com.payline.pmapi.bean.paymentform.request.PaymentFormLogoRequest;
 import com.payline.pmapi.bean.paymentform.response.configuration.PaymentFormConfigurationResponse;
 import com.payline.pmapi.bean.paymentform.response.configuration.impl.PaymentFormConfigurationResponseSpecific;
-import com.payline.pmapi.bean.paymentform.response.logo.PaymentFormLogoResponse;
-import com.payline.pmapi.bean.paymentform.response.logo.impl.PaymentFormLogoResponseFile;
-import com.payline.pmapi.service.PaymentFormConfigurationService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -30,13 +19,7 @@ import java.util.Map;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
-public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigurationService {
-
-    private static final String LOGO_CONTENT_TYPE = "image/png";
-    private static final int LOGO_HEIGHT = 256;
-    private static final int LOGO_WIDTH = 256;
-
-    private static final Logger LOGGER = LogManager.getLogger(PaymentFormConfigurationServiceImpl.class);
+public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormConfigurationService {
 
     @Override
     public PaymentFormConfigurationResponse getPaymentFormConfiguration(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
@@ -90,54 +73,19 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
 
     }
 
-    @Override
-    public PaymentFormLogoResponse getPaymentFormLogo(PaymentFormLogoRequest paymentFormLogoRequest) {
-        return PaymentFormLogoResponseFile.PaymentFormLogoResponseFileBuilder.aPaymentFormLogoResponseFile()
-                .withHeight(LOGO_HEIGHT)
-                .withWidth(LOGO_WIDTH)
-                .withTitle("Title") //TODO
-                .withAlt("Alt") //TODO
-                .build();
-    }
-
-    @Override
-    public PaymentFormLogo getLogo(String paymentMethodIdentifier, Locale locale) {
-        try {
-            // Read logo file
-            InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("logo.png");
-            BufferedImage logo = ImageIO.read(input);
-
-            // Recover byte array from image
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(logo, "png", baos);
-
-            return PaymentFormLogo.PaymentFormLogoBuilder.aPaymentFormLogo()
-                    .withFile(baos.toByteArray())
-                    .withContentType(LOGO_CONTENT_TYPE)
-                    .build();
-
-        } catch (IOException e) {
-            LOGGER.error("unable to load the logo: {}", e.getMessage(), e);
-            throw new RuntimeException("Unable to load logo");
-        }
-    }
-
     /**
      * @return
      */
     private URL getGooglePayScriptUrl() {
 
-        URL url = null;
-
         try {
 
-            url = new URL(JS_URL_GOOGLE_PAY);
+            return new URL(JS_URL_GOOGLE_PAY);
 
         } catch (MalformedURLException e) {
             LOGGER.error(e.getMessage());
         }
-
-        return url;
+        return null;
 
     }
 
@@ -145,6 +93,8 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
      * @return
      */
     private String getInitPaymentJavaScript(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
+
+
         String scriptInitPaymentContent = "";
 
         // get info to put in .js
@@ -185,7 +135,6 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
             LOGGER.error(e.getMessage());
             // todo lever une exception ????Runtime????
         }
-
 
         // todo remplacer aussi   le totalPriceStatus(192)
         // todo apres remplacer allowedCardNetWork(l18) & allowedCard

@@ -88,5 +88,3 @@ task generateMetaInf {
         }
     }
 }
-
-build << { generateMetaInf }

@@ -15,11 +15,11 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.YearMonth;
 
-import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENT_REQUEST_PAYMENT_DATA_KEY;
 
 public class PaymentServiceImpl implements PaymentService {
 
-    private static final Logger LOGGER = LogManager.getLogger( PaymentServiceImpl.class );
+    private static final Logger LOGGER = LogManager.getLogger(PaymentServiceImpl.class);
 
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
