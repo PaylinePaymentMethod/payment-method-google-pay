@@ -15,7 +15,7 @@ const baseRequest = {
  * @see {@link https://developers.google.com/pay/api/web/reference/object#CardParameters|CardParameters}
  * @todo confirm card networks supported by your site and gateway
  */
-const allowedCardNetworks = ["AMEX", "DISCOVER", "JCB", "MASTERCARD", "VISA"];
+const allowedCardNetworks = ${allowedCardNetworks};
 
 /**
  * Card authentication methods supported by your site and your gateway
@@ -24,7 +24,7 @@ const allowedCardNetworks = ["AMEX", "DISCOVER", "JCB", "MASTERCARD", "VISA"];
  * @todo confirm your processor supports Android device tokens for your
  * supported card networks
  */
-const allowedCardAuthMethods = ["PAN_ONLY", "CRYPTOGRAM_3DS"];
+const allowedCardAuthMethods = ${allowedCardAuthMethods};
 
 /**
  * Identify your gateway and your site's gateway merchant identifier

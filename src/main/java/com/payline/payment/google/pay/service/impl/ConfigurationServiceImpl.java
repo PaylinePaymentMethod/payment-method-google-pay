@@ -21,7 +21,7 @@ import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
 
-    private static final Logger LOGGER = LogManager.getLogger( ConfigurationServiceImpl.class );
+    private static final Logger LOGGER = LogManager.getLogger(ConfigurationServiceImpl.class);
 
     private I18nService i18n = I18nService.getInstance();
 
@@ -40,7 +40,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
         parameters.add(merchantName);
 
-        // parameters used to identify the merchant
         final InputParameter merchantId = new InputParameter();
         merchantId.setKey(MERCHANT_ID_KEY);
         merchantId.setLabel(this.i18n.getMessage(MERCHANT_ID_LABEL, locale));
@@ -73,6 +72,16 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         parameters.add(buttonType);
 
         // parameters used to choose payment networks
+        final InputParameter allowedAuthMethod = new InputParameter();
+        Map<String, String> authMethod = new HashMap<>();
+        authMethod.put(METHOD_PANONLY_KEY, this.i18n.getMessage(METHOD_PANONLY_VAL, locale));
+        authMethod.put(METHOD_3DS_KEY, this.i18n.getMessage(METHOD_3DS_VAL, locale));
+        authMethod.put(METHOD_BOTH_KEY, this.i18n.getMessage(METHOD_BOTH_VAL, locale));
+        allowedAuthMethod.setKey(ALLOWED_AUTH_METHOD_KEY);
+        allowedAuthMethod.setLabel(this.i18n.getMessage(ALLOWED_AUTH_METHOD_LABEL, locale));
+        allowedAuthMethod.setDescription(this.i18n.getMessage(ALLOWED_AUTH_METHOD_DESCRIPTION, locale));
+        allowedAuthMethod.setRequired(true);
+
         final InputParameter gatewayMerchantId = new InputParameter();
         gatewayMerchantId.setKey(GATEWAY_MERCHANT_ID_KEY);
         gatewayMerchantId.setLabel(this.i18n.getMessage(GATEWAY_MERCHANT_ID_LABEL, locale));
@@ -180,7 +189,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         // TODO
 
         // No need to go forward if there is an error at this point
-        if( errors.size() > 0 ){
+        if (errors.size() > 0) {
             return errors;
         }
 
@@ -207,7 +216,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public String getName(Locale locale) {
-        return this.i18n.getMessage( PAYMENT_METHOD_NAME, locale );
+        return this.i18n.getMessage(PAYMENT_METHOD_NAME, locale);
     }
 
 }

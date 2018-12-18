@@ -1,14 +1,4 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
-    }
-}
-
+import org.apache.tools.ant.filters.*
 
 plugins {
     id "com.github.johnrengelman.shadow" version "2.0.1"
@@ -86,6 +76,10 @@ dependencies {
     fatJarTest group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.3'
     fatJarTest group: 'org.seleniumhq.selenium', name: 'selenium-server', version: '3.13.0'
     fatJarTest group: 'org.seleniumhq.selenium', name: 'selenium-support', version: '3.13.0'
+}
+
+dependencyCheck {
+    format 'ALL'
 }
 
 assemble.dependsOn shadowJar
