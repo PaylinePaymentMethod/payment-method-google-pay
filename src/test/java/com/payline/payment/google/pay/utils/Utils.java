@@ -4,10 +4,7 @@ import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.configuration.PartnerConfiguration;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
-import com.payline.pmapi.bean.payment.Browser;
-import com.payline.pmapi.bean.payment.ContractConfiguration;
-import com.payline.pmapi.bean.payment.Environment;
-import com.payline.pmapi.bean.payment.Order;
+import com.payline.pmapi.bean.payment.*;
 import com.payline.pmapi.bean.payment.request.NotifyTransactionStatusRequest;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.payment.request.TransactionStatusRequest;
@@ -15,6 +12,8 @@ import com.payline.pmapi.bean.paymentform.request.PaymentFormConfigurationReques
 
 import java.math.BigInteger;
 import java.util.*;
+
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
 // todo bien relire et nettoyer ce fichier
 public class Utils {
@@ -25,18 +24,19 @@ public class Utils {
     public static final String NOTIFICATION_URL = "http://notificationurl.com/";
     public static final String AUTH_URL = "http://authenticationurl.com/";
 
-    public static final String MERCHANT_ID = "virtual shop";
-    public static final String SERVICE_ID = "db1294c3c8bc42fe9ce762";
+    public static final String MERCHANT_NAME_VAL = ""; // todo
+    public static final String MERCHANT_ID_VAL = ""; // todo
+    public static final String GATEWAY_MERCHANT_ID_VAL = ""; // todo
 
-    public static ContractParametersCheckRequest createContractParametersCheckRequest(String merchantName) {
-        return createContractParametersCheckRequestBuilder(merchantName).build();
+    public static ContractParametersCheckRequest createContractParametersCheckRequest() {
+        return createContractParametersCheckRequestBuilder().build();
     }
 
-    public static ContractParametersCheckRequest.CheckRequestBuilder createContractParametersCheckRequestBuilder(String merchantName) {
+    public static ContractParametersCheckRequest.CheckRequestBuilder createContractParametersCheckRequestBuilder() {
         Map<String, String> accountInfo = new HashMap<>();
 //        accountInfo.put(CONTRACT_CONFIG_MERCHANT_NAME, merchantName);
 
-        ContractConfiguration configuration = createContractConfiguration(merchantName);
+        ContractConfiguration configuration = createContractConfiguration();
         Environment environment = createDefaultPaylineEnvironment();
 
         return ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
@@ -50,7 +50,7 @@ public class Utils {
 
     public static PaymentRequest.Builder createCompletePaymentBuilder() {
         final Amount amount = createAmount(EUR);
-        final ContractConfiguration contractConfiguration = createContractConfiguration(MERCHANT_ID);
+        final ContractConfiguration contractConfiguration = createContractConfiguration();
         final Environment paylineEnvironment = new Environment(NOTIFICATION_URL, SUCCESS_URL, FAILURE_URL, true);
         final String transactionID = createTransactionId();
         final Order order = createOrder(transactionID);
@@ -115,17 +115,23 @@ public class Utils {
         return phoneNumbers;
     }
 
-    // todo bien creer de contractConfiguration
-    public static ContractConfiguration createContractConfiguration(String merchantName) {
+    public static ContractConfiguration createContractConfiguration() {
         final ContractConfiguration contractConfiguration = new ContractConfiguration("", new HashMap<>());
-//        contractConfiguration.getContractProperties().put(CONTRACT_CONFIG_MERCHANT_NAME, new ContractProperty(merchantName));
+        contractConfiguration.getContractProperties().put(MERCHANT_NAME_KEY, new ContractProperty(MERCHANT_NAME_VAL));
+        contractConfiguration.getContractProperties().put(MERCHANT_ID_KEY, new ContractProperty(MERCHANT_ID_VAL));
+        contractConfiguration.getContractProperties().put(BUTTON_COLOR_KEY, new ContractProperty(COLOR_DEFAULT_KEY));
+        contractConfiguration.getContractProperties().put(BUTTON_SIZE_KEY, new ContractProperty(SIZE_LONG_KEY));
+        contractConfiguration.getContractProperties().put(GATEWAY_MERCHANT_ID_KEY, new ContractProperty(GATEWAY_MERCHANT_ID_VAL));
 
-        return contractConfiguration;
-    }
 
-    public static ContractConfiguration createDefaultContractConfiguration() {
-        final ContractConfiguration contractConfiguration = new ContractConfiguration("", new HashMap<>());
-//        contractConfiguration.getContractProperties().put(CONTRACT_CONFIG_MERCHANT_NAME, new ContractProperty(MERCHANT_ID));
+
+        contractConfiguration.getContractProperties().put(ACTIVATE_NETWORK_CB_KEY, new ContractProperty(YES_KEY));
+        contractConfiguration.getContractProperties().put(ACTIVATE_NETWORK_VISA_KEY, new ContractProperty(YES_KEY));
+        contractConfiguration.getContractProperties().put(ACTIVATE_NETWORK_MASTERCARD_KEY, new ContractProperty(YES_KEY));
+        contractConfiguration.getContractProperties().put(ACTIVATE_NETWORK_AMEX_KEY, new ContractProperty(YES_KEY));
+
+        contractConfiguration.getContractProperties().put(ALLOWED_AUTH_METHOD_KEY, new ContractProperty(METHOD_BOTH_KEY));
+
         return contractConfiguration;
     }
 
@@ -171,7 +177,7 @@ public class Utils {
                 .withLocale(Locale.FRANCE)
                 .withBuyer(createDefaultBuyer())
                 .withAmount(new Amount(null, Currency.getInstance(EUR)))
-                .withContractConfiguration(createContractConfiguration(MERCHANT_ID))
+                .withContractConfiguration(createContractConfiguration())
                 .withOrder(createOrder("007"))
                 .withEnvironment(createDefaultPaylineEnvironment())
                 .withPartnerConfiguration(createDefaultPartnerConfiguration())
@@ -187,7 +193,7 @@ public class Utils {
                 .withPartnerTransactionId("1")
                 .withTransactionSatus(NotifyTransactionStatusRequest.TransactionStatus.SUCCESS)
                 .withAmount(createAmount(EUR))
-                .withContractConfiguration(createContractConfiguration(MERCHANT_ID))
+                .withContractConfiguration(createContractConfiguration())
                 .withEnvironment(createDefaultPaylineEnvironment())
                 .withPartnerConfiguration(createDefaultPartnerConfiguration());
     }
@@ -200,7 +206,7 @@ public class Utils {
                 .withBuyer(createDefaultBuyer())
                 .withEnvironment(createDefaultPaylineEnvironment())
                 .withPartnerConfiguration(createDefaultPartnerConfiguration())
-                .withContractConfiguration(createContractConfiguration(MERCHANT_ID))
+                .withContractConfiguration(createContractConfiguration())
                 .withTransactionId(transactionId)
                 .build();
     }

@@ -1,5 +1,6 @@
 package com.payline.payment.google.pay.service.impl;
 
+import com.payline.pmapi.bean.payment.ContractProperty;
 import com.payline.pmapi.bean.paymentform.bean.PaymentFormLogo;
 import com.payline.pmapi.bean.paymentform.bean.form.PartnerWidgetForm;
 import com.payline.pmapi.bean.paymentform.bean.form.partnerwidget.PartnerWidgetContainerTargetDivId;
@@ -25,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Locale;
+import java.util.Map;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
@@ -143,27 +145,29 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
      * @return
      */
     private String getInitPaymentJavaScript(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
-
-        String rawScriptInitPaymentContent = "";
         String scriptInitPaymentContent = "";
 
         // get info to put in .js
-        final String merchantId = paymentFormConfigurationRequest.getContractConfiguration().getProperty(MERCHANT_ID_KEY).getValue();
-        final String merchantName = paymentFormConfigurationRequest.getContractConfiguration().getProperty(MERCHANT_NAME_KEY).getValue();
+        final Map<String, ContractProperty> properties = paymentFormConfigurationRequest.getContractConfiguration().getContractProperties();
+        final String merchantId = properties.get(MERCHANT_ID_KEY).getValue();
+        final String merchantName = properties.get(MERCHANT_NAME_KEY).getValue();
+        final String gatewayMerchantId = properties.get(GATEWAY_MERCHANT_ID_KEY).getValue();
         final String environment = paymentFormConfigurationRequest.getEnvironment().isSandbox() ? TEST : PRODUCTION;
         final String currency = paymentFormConfigurationRequest.getAmount().getCurrency().getCurrencyCode();
         final String price = String.valueOf(paymentFormConfigurationRequest.getAmount().getAmountInSmallestUnit());
-        final String buttonType = paymentFormConfigurationRequest.getContractConfiguration().getProperty(BUTTON_SIZE_KEY).getValue();
-        final String buttonColor = paymentFormConfigurationRequest.getContractConfiguration().getProperty(BUTTON_COLOR_KEY).getValue();
+        final String buttonType = properties.get(BUTTON_SIZE_KEY).getValue();
+        final String buttonColor = properties.get(BUTTON_COLOR_KEY).getValue();
 
         try {
             File file = new File(this.getClass().getClassLoader().getResource(JS_RES_INIT_PAYMENT).getFile());
-            rawScriptInitPaymentContent = new String(Files.readAllBytes(file.toPath()));
+            String rawScriptInitPaymentContent = new String(Files.readAllBytes(file.toPath()));
 
             scriptInitPaymentContent = rawScriptInitPaymentContent
+                    .replace(JS_PARAM_TAG_ALLOWED_CARD_NETWORKS, getAllowedCards(properties))
+                    .replace(JS_PARAM_TAG_ALLOWED_AUTH_METHODS, getAllowedAuthMethod(properties))
                     .replace(JS_PARAM_TAG_TYPE, JS_PARAM_VALUE_TYPE)
                     .replace(JS_PARAM_TAG_GATEWAY, JS_PARAM_VALUE_GATEWAY_NAME)
-                    .replace(JS_PARAM_TAG_GATEWAY_MERCHANT_ID, "gatewayMerchantId")
+                    .replace(JS_PARAM_TAG_GATEWAY_MERCHANT_ID, gatewayMerchantId)
 
                     .replace(JS_PARAM_TAG_MERCHANT_ID, merchantId)
                     .replace(JS_PARAM_TAG_MERCHANT_NAME, merchantName)
@@ -190,6 +194,47 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
 
         return scriptInitPaymentContent;
 
+    }
+
+    public String getAllowedCards(Map<String, ContractProperty> contractPropertyMap) {
+        StringBuilder sb = new StringBuilder();
+
+        // check every contract properties
+        for (String key : contractPropertyMap.keySet()) {
+            // check if key contains "activateNetwork" and the value is "TRUE"
+            if (key.contains(ACTIVATE_NETWORK_REGEX) && YES_KEY.equals(contractPropertyMap.get(key).getValue())) {
+                // get the payment Network
+                String network = key.split(ACTIVATE_NETWORK_REGEX)[1];
+
+                // add the network to the list
+                sb.append(sb.length() == 0 ? "[" : ", ");
+                sb.append("\"").append(network).append("\"");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public String getAllowedAuthMethod(Map<String, ContractProperty> contractPropertyMap) {
+        StringBuilder sb = new StringBuilder("[");
+
+        String allowedAuthMethod = contractPropertyMap.get(ALLOWED_AUTH_METHOD_KEY).getValue();
+        switch (allowedAuthMethod) {
+            case METHOD_PANONLY_KEY:
+                sb.append("\"").append(JS_PARAM_VALUE_PANONLY).append("\"");
+                break;
+            case METHOD_3DS_KEY:
+                sb.append("\"").append(JS_PARAM_VALUE_3DS).append("\"");
+                break;
+            case METHOD_BOTH_KEY:
+                sb.append("\"").append(JS_PARAM_VALUE_PANONLY).append("\"").append(", ")
+                        .append("\"").append(JS_PARAM_VALUE_3DS).append("\"");
+                break;
+            default:
+                break;
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
 }
