@@ -4,12 +4,6 @@ public class GooglePayConstants {
 
     public static final String PRIVATE_KEY = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgSaq46Z66YlV9Gp/B0WfRB7b4deHKeSE/kSDPI7+5Dw2hRANCAAQD5EWZSKBoQTlspL9hpHFfBvGUhSubJC/dF0uTPKTTwuo2fb+t/kUY2ZJJyuJWI4b9qqLBVxmye359mZAfQNCY";
 
-    public static final String PAYMENT_METHOD_NAME = "paymentMethod.name";
-
-    public static final String RELEASE_DATE_FORMAT = "dd/MM/yyyy";
-    public static final String RELEASE_DATE = "release.date";
-    public static final String RELEASE_VERSION = "release.version";
-    public static final String RELEASE_PROPERTIES = "release.properties";
 
     public static final String RESOURCE_BUNDLE_BASE_NAME = "messages";
 

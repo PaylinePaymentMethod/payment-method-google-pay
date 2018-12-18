@@ -18,10 +18,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+import static com.payline.payment.google.pay.utils.propertiesFilesConstants.ConfigurationConstants.*;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
 
-    private static final Logger LOGGER = LogManager.getLogger( ConfigurationServiceImpl.class );
+    private static final Logger LOGGER = LogManager.getLogger(ConfigurationServiceImpl.class);
 
     private I18nService i18n = I18nService.getInstance();
 
@@ -180,7 +181,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         // TODO
 
         // No need to go forward if there is an error at this point
-        if( errors.size() > 0 ){
+        if (errors.size() > 0) {
             return errors;
         }
 
@@ -207,7 +208,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public String getName(Locale locale) {
-        return this.i18n.getMessage( PAYMENT_METHOD_NAME, locale );
+        return this.i18n.getMessage(PAYMENT_METHOD_NAME, locale);
     }
 
 }
