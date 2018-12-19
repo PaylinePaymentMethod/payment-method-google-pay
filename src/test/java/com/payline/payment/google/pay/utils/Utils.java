@@ -27,6 +27,8 @@ public class Utils {
     public static final String MERCHANT_NAME_VAL = ""; // todo
     public static final String MERCHANT_ID_VAL = ""; // todo
     public static final String GATEWAY_MERCHANT_ID_VAL = ""; // todo
+    public static final String PRIVATE_KEY = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgSaq46Z66YlV9Gp/B0WfRB7b4deHKeSE/kSDPI7+5Dw2hRANCAAQD5EWZSKBoQTlspL9hpHFfBvGUhSubJC/dF0uTPKTTwuo2fb+t/kUY2ZJJyuJWI4b9qqLBVxmye359mZAfQNCY";
+
 
     public static ContractParametersCheckRequest createContractParametersCheckRequest() {
         return createContractParametersCheckRequestBuilder().build();
@@ -59,8 +61,9 @@ public class Utils {
         final Buyer buyer = createDefaultBuyer();
 
         Map<String, String> configMap = new HashMap();
-//        configMap.put(PARTNER_CONFIG_SERVICE_ID, SERVICE_ID);
-        final PartnerConfiguration configuration = new PartnerConfiguration(configMap, new HashMap<>());
+        Map<String, String> configSensitiveMap = new HashMap();
+        configSensitiveMap.put(PRIVATE_KEY_PATH, PRIVATE_KEY);
+        final PartnerConfiguration configuration = new PartnerConfiguration(configMap, configSensitiveMap);
 
         return PaymentRequest.builder()
                 .withAmount(amount)

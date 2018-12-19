@@ -56,7 +56,7 @@ public class PaymentFormConfigurationServiceImplTest {
     @Test
     public void testGetPaymentFormLogo()throws IOException {
         // given: the logo image read from resources
-        InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("logo.png");
+        InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("google-pay-logo.png");
         BufferedImage image = ImageIO.read(input);
 
         // when: getPaymentFormLogo is called

@@ -23,45 +23,16 @@ public class PaymentMethodData {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public CardInfo getInfo() {
         return info;
     }
 
-    public void setInfo(CardInfo info) {
-        this.info = info;
-    }
-
     public PaymentMethodTokenizationData getTokenizationData() {
         return tokenizationData;
-    }
-
-    public void setTokenizationData(PaymentMethodTokenizationData tokenizationData) {
-        this.tokenizationData = tokenizationData;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder result = new StringBuilder();
-
-        result.append("type : " + type + "\n");
-        result.append("description : " + description + "\n");
-
-        result.append(info.toString());
-        result.append(tokenizationData.toString());
-
-        return result.toString();
     }
 
 }

@@ -79,7 +79,6 @@ function onGooglePayLoaded() {
       .then(function(response) {
         if (response.result) {
           addGooglePayButton();
-          // @todo prefetch payment data to improve performance after confirming site functionality
           // prefetchGooglePaymentData();
         }
       })

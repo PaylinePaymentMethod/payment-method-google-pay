@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class ConfigurationServiceImplTest {
     @InjectMocks
@@ -21,7 +22,9 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void check(){
-        // todo!!
+        Map<String, String> errors = service.check(null);
+        Assert.assertNotNull(errors);
+        Assert.assertEquals(0, errors.size());
     }
 
 
