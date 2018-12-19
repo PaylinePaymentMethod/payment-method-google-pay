@@ -24,8 +24,8 @@ apply plugin: 'java-library'
 apply plugin: 'jacoco'
 
 // Toggle comments to switch environment
-//apply from: "monext.gradle"
-apply from: "external.gradle"
+apply from: "monext.gradle"
+//apply from: "external.gradle"
 
 description = 'payment-method-google-pay'
 group 'com.payline.payment.google.pay'
@@ -67,7 +67,6 @@ dependencies {
     implementation(group: 'com.google.crypto.tink', name: 'tink', version: '1.2.1') {
         transitive = false
     }
-
 
     implementation('com.google.crypto.tink:apps-paymentmethodtoken:1.2.1') {
         transitive = false

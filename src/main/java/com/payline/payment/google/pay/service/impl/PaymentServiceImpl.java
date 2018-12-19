@@ -33,7 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             // decrypt data
             String token = paymentData.getPaymentMethodData().getTokenizationData().getToken();
-            String privateKey = paymentRequest.getPartnerConfiguration().getSensitiveProperties().get(PRIVATE_KEY_PATH);
+            String privateKey = paymentRequest.getPartnerConfiguration().getProperty(PRIVATE_KEY_PATH);
             String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, paymentRequest.getEnvironment().isSandbox());
             DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
 
