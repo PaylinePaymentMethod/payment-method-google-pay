@@ -8,14 +8,11 @@ import com.payline.pmapi.bean.payment.response.impl.PaymentResponseDoPayment;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -53,16 +50,11 @@ public class GooglePayIT {
         options.addArguments("disable-web-security");
         options.addArguments("allow-running-insecure-content");
 
-        DesiredCapabilities cap = DesiredCapabilities.chrome();
-        cap.setCapability(ChromeOptions.CAPABILITY, options);
-
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
-        cap.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-        cap.setJavascriptEnabled(true);
+
         // Start browser
-        WebDriver driver = new ChromeDriver(cap);
-        JavascriptExecutor js = (JavascriptExecutor) driver;
+        WebDriver driver = new ChromeDriver();
         try {
 
             ClassLoader classLoader = this.getClass().getClassLoader();

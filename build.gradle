@@ -1,4 +1,15 @@
-import org.apache.tools.ant.filters.*
+import org.apache.tools.ant.filters.EscapeUnicode
+import org.apache.tools.ant.filters.ReplaceTokens
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+    }
+}
+
 
 plugins {
     id "com.github.johnrengelman.shadow" version "2.0.1"

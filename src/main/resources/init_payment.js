@@ -228,7 +228,6 @@ function onGooglePaymentButtonClicked() {
  */
 function processPayment(paymentData) {
   // show returned data in developer console for debugging
-  console.log(paymentData); // todo enlever cette ligne!
   // pass payment data response to your gateway to process payment
   ${callback}(paymentData);
 }

@@ -1,9 +1,7 @@
 package com.payline.payment.google.pay.utils;
 
 public class GooglePayConstants {
-
-    public static final String PRIVATE_KEY = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgSaq46Z66YlV9Gp/B0WfRB7b4deHKeSE/kSDPI7+5Dw2hRANCAAQD5EWZSKBoQTlspL9hpHFfBvGUhSubJC/dF0uTPKTTwuo2fb+t/kUY2ZJJyuJWI4b9qqLBVxmye359mZAfQNCY";
-
+    public static final String PRIVATE_KEY_PATH = "partner.google.pay.access.private.key";
 
     public static final String RESOURCE_BUNDLE_BASE_NAME = "messages";
 
@@ -39,8 +37,10 @@ public class GooglePayConstants {
     public static final String JS_RES_INIT_PAYMENT = "init_payment.js";
 
     public static final String JS_START_METHOD_NAME = "onGooglePayLoaded()";
-
+    public static final String ACTIVATE_NETWORK_REGEX = "activateNetwork";
     public static final String PAYMENT_REQUEST_PAYMENT_DATA_KEY = "data";
+    public static final String BUTTON_DESCRIPTION = "";
+    public static final String FAILURE_TRANSACTION_ID = "NO TRANSACTION YET";
 
     // data used in ConfigurationService
     public static final String MERCHANT_NAME_KEY = "merchantName";
@@ -63,17 +63,17 @@ public class GooglePayConstants {
     public static final String BUTTON_SIZE_LABEL = "button.size.label";
     public static final String SIZE_SHORT_KEY = "SHORT";
     public static final String SIZE_SHORT_VAL = "size.short.label";
-    public static final String SIZE_LONG_KEY = "button.size.label";
-    public static final String SIZE_LONG_VAL = "button.size.label";
+    public static final String SIZE_LONG_KEY = "LONG";
+    public static final String SIZE_LONG_VAL = "size.long.label";
 
     public static final String GATEWAY_MERCHANT_ID_KEY = "GatewayMerchantId";
     public static final String GATEWAY_MERCHANT_ID_LABEL = "GatewayMerchantId.label";
-    public static final String GATEWAY_MERCHANT_ID_DESCRIPTION = "GatewayMerchantId.descrption";
+    public static final String GATEWAY_MERCHANT_ID_DESCRIPTION = "GatewayMerchantId.description";
 
     public static final String YES_KEY = "YES";
     public static final String NO_KEY = "NO";
-    public static final String YES_VAL = "yes";
-    public static final String NO_VAL = "no";
+    public static final String YES_VAL = "activate.yes";
+    public static final String NO_VAL = "activate.no";
     public static final String METHOD_PANONLY_KEY = "METHOD_PANONLY";
     public static final String METHOD_3DS_KEY = "METHOD_3DS";
     public static final String METHOD_BOTH_KEY = "METHOD_BOTH";
@@ -84,19 +84,23 @@ public class GooglePayConstants {
     public static final String ALLOWED_AUTH_METHOD_LABEL = "allowed.auth.method.label";
     public static final String ALLOWED_AUTH_METHOD_DESCRIPTION = "allowed.auth.method.description";
     public static final String ACTIVATE_NETWORK_CB_KEY = "activateNetworkCB";
-    public static final String ACTIVATE_NETWORK_CB_LABEL = "network.activate.cb";
+    public static final String ACTIVATE_NETWORK_CB_LABEL = "network.activate.cb.label";
+    public static final String ACTIVATE_NETWORK_CB_DESCRIPTION = "network.activate.cb.description";
     public static final String ACTIVATE_NETWORK_VISA_KEY = "activateNetworkVISA";
-    public static final String ACTIVATE_NETWORK_VISA_LABEL = "network.activate.visa";
+    public static final String ACTIVATE_NETWORK_VISA_LABEL = "network.activate.visa.label";
+    public static final String ACTIVATE_NETWORK_VISA_DESCRIPTION = "network.activate.visa.description";
     public static final String ACTIVATE_NETWORK_MASTERCARD_KEY = "activateNetworkMASTERCARD";
-    public static final String ACTIVATE_NETWORK_MASTERCARD_LABEL = "network.activate.mastercard";
+    public static final String ACTIVATE_NETWORK_MASTERCARD_LABEL = "network.activate.mastercard.label";
+    public static final String ACTIVATE_NETWORK_MASTERCARD_DESCRIPTION = "network.activate.mastercard.description";
     public static final String ACTIVATE_NETWORK_AMEX_KEY = "activateNetworkAMEX";
-    public static final String ACTIVATE_NETWORK_AMEX_LABEL = "network.activate.amex";
+    public static final String ACTIVATE_NETWORK_AMEX_LABEL = "network.activate.amex.label";
+    public static final String ACTIVATE_NETWORK_AMEX_DESCRIPTION = "network.activate.amex.description";
     public static final String ACTIVATE_NETWORK_JCB_KEY = "activateNetworkJCB";
-    public static final String ACTIVATE_NETWORK_JCB_LABEL = "network.activate.jcb";
+    public static final String ACTIVATE_NETWORK_JCB_LABEL = "network.activate.jcb.label";
+    public static final String ACTIVATE_NETWORK_JCB_DESCRIPTION = "network.activate.jcb.description";
     public static final String ACTIVATE_NETWORK_DISCOVER_KEY = "activateNetworkDISCOVER";
-    public static final String ACTIVATE_NETWORK_DISCOVER_LABEL = "network.activate.discover";
-    public static final String ACTIVATE_NETWORK_REGEX = "activateNetwork";
-
+    public static final String ACTIVATE_NETWORK_DISCOVER_LABEL = "network.activate.discover.label";
+    public static final String ACTIVATE_NETWORK_DISCOVER_DESCRIPTION = "network.activate.discover.description";
 
     public static final String NETWORK_CB_LABEL = "network.credit.card.label";
     public static final String NETWORK_CB_DESCRIPTION = "network.credit.card.description";

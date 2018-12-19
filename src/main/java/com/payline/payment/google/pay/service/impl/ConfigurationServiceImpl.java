@@ -30,8 +30,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     public List<AbstractParameter> getParameters(Locale locale) {
         List<AbstractParameter> parameters = new ArrayList<>();
 
-        // TODO internationaliser
-
         // parameters used to identify the merchant
         final InputParameter merchantName = new InputParameter();
         merchantName.setKey(MERCHANT_NAME_KEY);
@@ -73,11 +71,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         parameters.add(buttonType);
 
         // parameters used to choose payment networks
-        final InputParameter allowedAuthMethod = new InputParameter();
+        final ListBoxParameter allowedAuthMethod = new ListBoxParameter();
         Map<String, String> authMethod = new HashMap<>();
         authMethod.put(METHOD_PANONLY_KEY, this.i18n.getMessage(METHOD_PANONLY_VAL, locale));
         authMethod.put(METHOD_3DS_KEY, this.i18n.getMessage(METHOD_3DS_VAL, locale));
         authMethod.put(METHOD_BOTH_KEY, this.i18n.getMessage(METHOD_BOTH_VAL, locale));
+        allowedAuthMethod.setList(authMethod);
         allowedAuthMethod.setKey(ALLOWED_AUTH_METHOD_KEY);
         allowedAuthMethod.setLabel(this.i18n.getMessage(ALLOWED_AUTH_METHOD_LABEL, locale));
         allowedAuthMethod.setDescription(this.i18n.getMessage(ALLOWED_AUTH_METHOD_DESCRIPTION, locale));
@@ -99,6 +98,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         final ListBoxParameter activateNetworkCB = new ListBoxParameter();
         activateNetworkCB.setKey(ACTIVATE_NETWORK_CB_KEY);
         activateNetworkCB.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_CB_LABEL, locale));
+        activateNetworkCB.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_CB_DESCRIPTION, locale));
         activateNetworkCB.setList(yesNoList);
         activateNetworkCB.setRequired(true);
         parameters.add(activateNetworkCB);
@@ -113,6 +113,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         final ListBoxParameter activateNetworkVisa = new ListBoxParameter();
         activateNetworkVisa.setKey(ACTIVATE_NETWORK_VISA_KEY);
         activateNetworkVisa.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_VISA_LABEL, locale));
+        activateNetworkVisa.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_VISA_DESCRIPTION, locale));
         activateNetworkVisa.setList(yesNoList);
         activateNetworkVisa.setRequired(true);
         parameters.add(activateNetworkVisa);
@@ -127,6 +128,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         final ListBoxParameter activateNetworkMastercard = new ListBoxParameter();
         activateNetworkMastercard.setKey(ACTIVATE_NETWORK_MASTERCARD_KEY);
         activateNetworkMastercard.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_MASTERCARD_LABEL, locale));
+        activateNetworkMastercard.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_MASTERCARD_DESCRIPTION, locale));
         activateNetworkMastercard.setList(yesNoList);
         activateNetworkMastercard.setRequired(true);
         parameters.add(activateNetworkMastercard);
@@ -141,6 +143,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         final ListBoxParameter activateNetworkAmex = new ListBoxParameter();
         activateNetworkAmex.setKey(ACTIVATE_NETWORK_AMEX_KEY);
         activateNetworkAmex.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_AMEX_LABEL, locale));
+        activateNetworkAmex.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_AMEX_DESCRIPTION, locale));
         activateNetworkAmex.setList(yesNoList);
         activateNetworkAmex.setRequired(true);
         parameters.add(activateNetworkAmex);
@@ -151,50 +154,46 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         networkMastercard.setDescription(this.i18n.getMessage(NETWORK_AMEX_DESCRIPTION, locale));
         networkMastercard.setNetwork(AvailableNetwork.AMEX);
         parameters.add(networkAmex);
-//        final ListBoxParameter activateNetworkJCB = new ListBoxParameter();
-//        activateNetworkJCB.setKey(ACTIVATE_NETWORK_JCB_KEY);
-//        activateNetworkJCB.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_JCB_LABEL, locale));
-//        activateNetworkJCB.setList(yesNoList);
-//        activateNetworkJCB.setRequired(true);
-//        parameters.add(activateNetworkJCB);
-//
-//        final NetworkListBoxParameter networkJCB = new NetworkListBoxParameter();
-//        networkMastercard.setKey(AvailableNetwork.AMEX.getKey());   // todo AvailableNetwork.JCP
-//        networkMastercard.setLabel(this.i18n.getMessage(NETWORK_JCB_LABEL, locale));
-//        networkMastercard.setDescription(this.i18n.getMessage(NETWORK_JCB_DESCRIPTION, locale));
-//        networkMastercard.setNetwork(AvailableNetwork.AMEX);
-//        parameters.add(networkJCB);
-//
-//        final ListBoxParameter activateNetworkDiscover = new ListBoxParameter();
-//        activateNetworkDiscover.setKey(ACTIVATE_NETWORK_DISCOVER_KEY);
-//        activateNetworkDiscover.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_DISCOVER_LABEL, locale));
-//        activateNetworkDiscover.setList(yesNoList);
-//        activateNetworkDiscover.setRequired(true);
-//        parameters.add(activateNetworkDiscover);
-//
-//        final NetworkListBoxParameter networkDiscover = new NetworkListBoxParameter();
-//        networkMastercard.setKey(AvailableNetwork.AMEX.getKey());   // todo AvailableNetwork.DISCOVER
-//        networkMastercard.setLabel(this.i18n.getMessage(NETWORK_DISCOVER_LABEL, locale));
-//        networkMastercard.setDescription(this.i18n.getMessage(NETWORK_DISCOVER_DESCRIPTION, locale));
-//        networkMastercard.setNetwork(AvailableNetwork.AMEX);
-//        parameters.add(networkDiscover);
+
+/*        // not available yet
+        final ListBoxParameter activateNetworkJCB = new ListBoxParameter();
+        activateNetworkJCB.setKey(ACTIVATE_NETWORK_JCB_KEY);
+        activateNetworkJCB.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_JCB_LABEL, locale));
+        activateNetworkJCB.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_JCB_DESCRIPTION, locale));
+        activateNetworkJCB.setList(yesNoList);
+        activateNetworkJCB.setRequired(true);
+        parameters.add(activateNetworkJCB);
+
+        final NetworkListBoxParameter networkJCB = new NetworkListBoxParameter();
+        networkMastercard.setKey(AvailableNetwork.AMEX.getKey());   // todo AvailableNetwork.JCP
+        networkMastercard.setLabel(this.i18n.getMessage(NETWORK_JCB_LABEL, locale));
+        networkMastercard.setDescription(this.i18n.getMessage(NETWORK_JCB_DESCRIPTION, locale));
+        networkMastercard.setNetwork(AvailableNetwork.AMEX);
+        parameters.add(networkJCB);
+
+        final ListBoxParameter activateNetworkDiscover = new ListBoxParameter();
+        activateNetworkDiscover.setKey(ACTIVATE_NETWORK_DISCOVER_KEY);
+        activateNetworkDiscover.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_DISCOVER_LABEL, locale));
+        activateNetworkDiscover.sd(this.i18n.getMessage(ACTIVATE_NETWORK_DISCOVER_DESCRIPTION, locale));
+        activateNetworkDiscover.setList(yesNoList);
+        activateNetworkDiscover.setRequired(true);
+        parameters.add(activateNetworkDiscover);
+
+        final NetworkListBoxParameter networkDiscover = new NetworkListBoxParameter();
+        networkMastercard.setKey(AvailableNetwork.AMEX.getKey());   // todo AvailableNetwork.DISCOVER
+        networkMastercard.setLabel(this.i18n.getMessage(NETWORK_DISCOVER_LABEL, locale));
+        networkMastercard.setDescription(this.i18n.getMessage(NETWORK_DISCOVER_DESCRIPTION, locale));
+        networkMastercard.setNetwork(AvailableNetwork.AMEX);
+        parameters.add(networkDiscover);
+        */
 
         return parameters;
     }
 
     @Override
     public Map<String, String> check(ContractParametersCheckRequest contractParametersCheckRequest) {
-//        Locale locale = contractParametersCheckRequest.getLocale();
-        final Map<String, String> errors = new HashMap<>();
-
-        // TODO
-
-        // No need to go forward if there is an error at this point
-        if (errors.size() > 0) {
-            return errors;
-        }
-
-        return errors;
+        // Google pay doesn't provide API to verify fields validity
+        return new HashMap<>();
     }
 
     @Override
