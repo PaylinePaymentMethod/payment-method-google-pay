@@ -108,7 +108,7 @@ public class Utils {
     }
 
     private static Buyer.FullName createFullName() {
-        return new Buyer.FullName("foo", "bar", Buyer.Civility.UNKNOWN);
+        return new Buyer.FullName("foo", "bar", "UNKNOWN");
     }
 
     private static Map<Buyer.PhoneNumberType, String> createDefaultPhoneNumbers() {
