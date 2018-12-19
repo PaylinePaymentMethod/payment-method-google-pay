@@ -1,4 +1,3 @@
-
 repositories {
     mavenLocal()
     mavenCentral()
@@ -50,8 +49,8 @@ task generateMetaInf {
             tree = fileTree('src/main').include('**/service/*')
         }
 
+        String _package = "";
         tree.each { File file ->
-            String _package = "";
             Map<String, String> imports = new HashMap<>();
             def _classname = "";
             file.eachLine { line ->
@@ -84,6 +83,8 @@ task generateMetaInf {
                 }
 
             }
+            def configMetafile = new File(srcDir.getPath() + '/com.payline.pmapi.service.PaymentFormConfigurationService')
+            configMetafile.write(_package + 'PaymentFormConfigurationServiceImpl');
 
         }
     }
