@@ -68,7 +68,6 @@ dependencies {
         transitive = false
     }
 
-
     implementation('com.google.crypto.tink:apps-paymentmethodtoken:1.2.1') {
         transitive = false
     }
