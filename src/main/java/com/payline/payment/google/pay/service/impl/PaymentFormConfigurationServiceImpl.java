@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
@@ -117,6 +119,7 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
         final String environment = paymentFormConfigurationRequest.getEnvironment().isSandbox() ? TEST : PRODUCTION;
         final String currency = paymentFormConfigurationRequest.getAmount().getCurrency().getCurrencyCode();
         final String price = GooglePayUtils.createStringAmount(paymentFormConfigurationRequest.getAmount().getAmountInSmallestUnit());
+        // the buttonType variable represents the size of the googlePay button
         final String buttonType = properties.get(BUTTON_SIZE_KEY).getValue();
         final String buttonColor = properties.get(BUTTON_COLOR_KEY).getValue();
 
@@ -146,22 +149,23 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
     }
 
     public String getAllowedCards(Map<String, ContractProperty> contractPropertyMap) {
-        StringBuilder sb = new StringBuilder();
+        List<String> allowedCard = new ArrayList<>();
 
         // check every contract properties
-        for (String key : contractPropertyMap.keySet()) {
+        for (Map.Entry<String, ContractProperty> entry : contractPropertyMap.entrySet()) {
             // check if key contains "activateNetwork" and the value is "TRUE"
+            String key = entry.getKey();
             if (key.contains(ACTIVATE_NETWORK_REGEX) && YES_KEY.equals(contractPropertyMap.get(key).getValue())) {
-                // get the payment Network
-                String network = key.split(ACTIVATE_NETWORK_REGEX)[1];
-
-                // add the network to the list
-                sb.append(sb.length() == 0 ? "[" : ", ");
-                sb.append("\"").append(network).append("\"");
+                allowedCard.add("\"" + key.split(ACTIVATE_NETWORK_REGEX)[1] + "\"");
             }
         }
-        sb.append("]");
-        return sb.toString();
+
+        if (allowedCard.isEmpty()) {
+            LOGGER.warn("No allowed Card for this payment");
+        }
+        String s = "[" + String.join(", ", allowedCard) + "]";
+        LOGGER.info("Allowed card list : {}", s);
+        return s;
     }
 
     public String getAllowedAuthMethod(Map<String, ContractProperty> contractPropertyMap) {
@@ -170,16 +174,20 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
         String allowedAuthMethod = contractPropertyMap.get(ALLOWED_AUTH_METHOD_KEY).getValue();
         switch (allowedAuthMethod) {
             case METHOD_PANONLY_KEY:
+                LOGGER.info("Payment initiated with allowed method : PAN only");
                 sb.append("\"").append(JS_PARAM_VALUE_PANONLY).append("\"");
                 break;
             case METHOD_3DS_KEY:
+                LOGGER.info("Payment initiated with allowed method : 3D secure");
                 sb.append("\"").append(JS_PARAM_VALUE_3DS).append("\"");
                 break;
             case METHOD_BOTH_KEY:
+                LOGGER.info("Payment initiated with allowed method : PAN only and 3D secure");
                 sb.append("\"").append(JS_PARAM_VALUE_PANONLY).append("\"").append(", ")
                         .append("\"").append(JS_PARAM_VALUE_3DS).append("\"");
                 break;
             default:
+                LOGGER.warn("Payment initiated without allowed method");
                 break;
         }
         sb.append("]");

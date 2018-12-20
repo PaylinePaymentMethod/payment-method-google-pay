@@ -67,7 +67,7 @@ public class GooglePayIT {
 
 
             // Wait for redirection to success or cancel url
-            WebDriverWait wait = new WebDriverWait(driver, 60 * 5);
+            WebDriverWait wait = new WebDriverWait(driver, 120);
             String paymentDataPath = "//*[@id=\"body\"]/div[2]";
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(paymentDataPath)));
             return ((ChromeDriver) driver).findElementByXPath(paymentDataPath).getText();
