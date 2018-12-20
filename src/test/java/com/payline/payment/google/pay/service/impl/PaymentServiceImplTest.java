@@ -37,7 +37,7 @@ public class PaymentServiceImplTest {
     @Test
     public void paymentRequest() throws GeneralSecurityException {
         PaymentRequest request = Utils.createCompletePaymentBuilder().build();
-        request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
+        request.getPartnerConfiguration().getSensitiveProperties().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
 
         doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
 
@@ -58,7 +58,7 @@ public class PaymentServiceImplTest {
     @Test
     public void paymentRequestKO() throws GeneralSecurityException {
         PaymentRequest request = Utils.createCompletePaymentBuilder().build();
-        request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
+        request.getPartnerConfiguration().getSensitiveProperties().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
 
 
         doThrow(new GeneralSecurityException()).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
