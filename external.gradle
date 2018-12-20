@@ -20,6 +20,7 @@ sonarqube {
         property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
         property 'sonar.dependencyCheck.htmlReportPath', "${project.buildDir}/reports/dependency-check-report.html"
 
+
         property 'sonar.organization', 'thales-services-monext'
         property 'sonar.host.url', 'https://sonarcloud.io'
     }
@@ -48,8 +49,8 @@ task generateMetaInf {
             tree = fileTree('src/main').include('**/service/*')
         }
 
+        String _package = "";
         tree.each { File file ->
-            String _package = "";
             Map<String, String> imports = new HashMap<>();
             def _classname = "";
             file.eachLine { line ->
@@ -82,9 +83,9 @@ task generateMetaInf {
                 }
 
             }
+            def configMetafile = new File(srcDir.getPath() + '/com.payline.pmapi.service.PaymentFormConfigurationService')
+            configMetafile.write(_package + 'PaymentFormConfigurationServiceImpl');
 
         }
     }
 }
-
-build << { generateMetaInf }

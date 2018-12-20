@@ -23,51 +23,16 @@ public class PaymentData {
         return apiVersion;
     }
 
-    public void setApiVersion(String apiVersion) {
-        this.apiVersion = apiVersion;
-    }
-
     public String getApiVersionMinor() {
         return apiVersionMinor;
-    }
-
-    public void setApiVersionMinor(String apiVersionMinor) {
-        this.apiVersionMinor = apiVersionMinor;
     }
 
     public PaymentMethodData getPaymentMethodData() {
         return paymentMethodData;
     }
 
-    public void setPaymentMethodData(PaymentMethodData paymentMethodData) {
-        this.paymentMethodData = paymentMethodData;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder result = new StringBuilder();
-
-        result.append("***** PaymentData info\n");
-
-        result.append("apiVersion : " + apiVersion + "\n");
-        result.append("apiVersionMinor : " + apiVersionMinor + "\n");
-        result.append("email : " + email + "\n");
-
-        result.append(paymentMethodData.toString());
-
-        return result.toString();
-    }
-
-    public String toJson() {
-        return new Gson().toJson(this);
     }
 
     //******************************************************************************************************************

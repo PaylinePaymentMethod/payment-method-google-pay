@@ -10,16 +10,21 @@ public class CardInfo {
     @SerializedName("cardDetails")
     private String cardDetails;
 
+    @SerializedName("billingAddress")
+    private BillingAddress billingAddress;
+
     public CardInfo() { }
 
-    @Override
-    public String toString() {
-        final StringBuilder result = new StringBuilder();
+    public String getCardNetwork() {
+        return cardNetwork;
+    }
 
-        result.append("cardNetwork : " + cardNetwork + "\n");
-        result.append("cardDetails : " + cardDetails + "\n");
+    public String getCardDetails() {
+        return cardDetails;
+    }
 
-        return result.toString();
+    public BillingAddress getBillingAddress() {
+        return billingAddress;
     }
 
 }
