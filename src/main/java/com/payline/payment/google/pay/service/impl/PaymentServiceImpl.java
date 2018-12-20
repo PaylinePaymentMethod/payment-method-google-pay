@@ -27,7 +27,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
 
-        String jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
+        String jsonPaymentData = paymentRequest.getPartnerConfiguration().getProperty(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
         PaymentData paymentData = new PaymentData.Builder().fromJson(jsonPaymentData);
 
         try {
