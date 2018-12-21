@@ -56,6 +56,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         buttonColor.setList(colors);
         buttonColor.setKey(BUTTON_COLOR_KEY);
         buttonColor.setLabel(this.i18n.getMessage(BUTTON_COLOR_LABEL, locale));
+        buttonColor.setDescription(this.i18n.getMessage(BUTTON_COLOR_DESCRIPTION, locale));
         buttonColor.setRequired(true);
         parameters.add(buttonColor);
 
@@ -66,6 +67,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         buttonType.setList(types);
         buttonType.setKey(BUTTON_SIZE_KEY);
         buttonType.setLabel(this.i18n.getMessage(BUTTON_SIZE_LABEL, locale));
+        buttonType.setDescription(this.i18n.getMessage(BUTTON_SIZE_DESCRIPTION, locale));
         buttonType.setRequired(true);
 
         parameters.add(buttonType);
@@ -82,26 +84,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         allowedAuthMethod.setDescription(this.i18n.getMessage(ALLOWED_AUTH_METHOD_DESCRIPTION, locale));
         allowedAuthMethod.setRequired(true);
 
-        final InputParameter gatewayMerchantId = new InputParameter();
-        gatewayMerchantId.setKey(GATEWAY_MERCHANT_ID_KEY);
-        gatewayMerchantId.setLabel(this.i18n.getMessage(GATEWAY_MERCHANT_ID_LABEL, locale));
-        gatewayMerchantId.setDescription(this.i18n.getMessage(GATEWAY_MERCHANT_ID_DESCRIPTION, locale));
-        gatewayMerchantId.setRequired(true);
-
-        parameters.add(gatewayMerchantId);
-
-
         Map<String, String> yesNoList = new HashMap<>();
         yesNoList.put(YES_KEY, this.i18n.getMessage(YES_VAL, locale));
         yesNoList.put(NO_KEY, this.i18n.getMessage(NO_VAL, locale));
-
-        final ListBoxParameter activateNetworkCB = new ListBoxParameter();
-        activateNetworkCB.setKey(ACTIVATE_NETWORK_CB_KEY);
-        activateNetworkCB.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_CB_LABEL, locale));
-        activateNetworkCB.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_CB_DESCRIPTION, locale));
-        activateNetworkCB.setList(yesNoList);
-        activateNetworkCB.setRequired(true);
-        parameters.add(activateNetworkCB);
 
         final NetworkListBoxParameter networkCb = new NetworkListBoxParameter();
         networkCb.setKey(AvailableNetwork.CB.getKey());

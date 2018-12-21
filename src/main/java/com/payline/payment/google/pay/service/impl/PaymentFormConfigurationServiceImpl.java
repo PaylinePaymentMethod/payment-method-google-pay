@@ -118,7 +118,6 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
         final Map<String, ContractProperty> properties = paymentFormConfigurationRequest.getContractConfiguration().getContractProperties();
         final String merchantId = properties.get(MERCHANT_ID_KEY).getValue();
         final String merchantName = properties.get(MERCHANT_NAME_KEY).getValue();
-        final String gatewayMerchantId = properties.get(GATEWAY_MERCHANT_ID_KEY).getValue();
         final String environment = paymentFormConfigurationRequest.getEnvironment().isSandbox() ? TEST : PRODUCTION;
         final String currency = paymentFormConfigurationRequest.getAmount().getCurrency().getCurrencyCode();
         final String price = GooglePayUtils.createStringAmount(paymentFormConfigurationRequest.getAmount().getAmountInSmallestUnit());
@@ -134,7 +133,7 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
                 .replace(JS_PARAM_TAG_ALLOWED_AUTH_METHODS, getAllowedAuthMethod(properties))
                 .replace(JS_PARAM_TAG_TYPE, JS_PARAM_VALUE_TYPE)
                 .replace(JS_PARAM_TAG_GATEWAY, JS_PARAM_VALUE_GATEWAY_NAME)
-                .replace(JS_PARAM_TAG_GATEWAY_MERCHANT_ID, gatewayMerchantId)
+                .replace(JS_PARAM_TAG_GATEWAY_MERCHANT_ID, merchantId)
 
                 .replace(JS_PARAM_TAG_MERCHANT_ID, merchantId)
                 .replace(JS_PARAM_TAG_MERCHANT_NAME, merchantName)
@@ -153,6 +152,7 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
 
     public String getAllowedCards(Map<String, ContractProperty> contractPropertyMap) {
         List<String> allowedCard = new ArrayList<>();
+        allowedCard.add("\"CB\"");
 
         // check every contract properties
         for (Map.Entry<String, ContractProperty> entry : contractPropertyMap.entrySet()) {
@@ -163,9 +163,6 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
             }
         }
 
-        if (allowedCard.isEmpty()) {
-            LOGGER.warn("No allowed Card for this payment");
-        }
         String s = "[" + String.join(", ", allowedCard) + "]";
         LOGGER.info("Allowed card list : {}", s);
         return s;

@@ -125,11 +125,7 @@ public class Utils {
         contractConfiguration.getContractProperties().put(MERCHANT_ID_KEY, new ContractProperty(MERCHANT_ID_VAL));
         contractConfiguration.getContractProperties().put(BUTTON_COLOR_KEY, new ContractProperty(COLOR_DEFAULT_KEY));
         contractConfiguration.getContractProperties().put(BUTTON_SIZE_KEY, new ContractProperty(SIZE_LONG_KEY));
-        contractConfiguration.getContractProperties().put(GATEWAY_MERCHANT_ID_KEY, new ContractProperty(GATEWAY_MERCHANT_ID_VAL));
 
-
-
-        contractConfiguration.getContractProperties().put(ACTIVATE_NETWORK_CB_KEY, new ContractProperty(YES_KEY));
         contractConfiguration.getContractProperties().put(ACTIVATE_NETWORK_VISA_KEY, new ContractProperty(YES_KEY));
         contractConfiguration.getContractProperties().put(ACTIVATE_NETWORK_MASTERCARD_KEY, new ContractProperty(YES_KEY));
         contractConfiguration.getContractProperties().put(ACTIVATE_NETWORK_AMEX_KEY, new ContractProperty(YES_KEY));

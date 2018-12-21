@@ -52,6 +52,7 @@ public class GooglePayConstants {
 
     public static final String BUTTON_COLOR_KEY = "buttonColor";
     public static final String BUTTON_COLOR_LABEL = "button.color.label";
+    public static final String BUTTON_COLOR_DESCRIPTION = "button.color.description";
     public static final String COLOR_DEFAULT_KEY = "DEFAULT";
     public static final String COLOR_DEFAULT_VAL = "color.default";
     public static final String COLOR_BLACK_KEY = "BLACK";
@@ -61,14 +62,11 @@ public class GooglePayConstants {
 
     public static final String BUTTON_SIZE_KEY = "buttonSize";
     public static final String BUTTON_SIZE_LABEL = "button.size.label";
+    public static final String BUTTON_SIZE_DESCRIPTION = "button.size.description";
     public static final String SIZE_SHORT_KEY = "SHORT";
     public static final String SIZE_SHORT_VAL = "size.short.label";
     public static final String SIZE_LONG_KEY = "LONG";
     public static final String SIZE_LONG_VAL = "size.long.label";
-
-    public static final String GATEWAY_MERCHANT_ID_KEY = "GatewayMerchantId";
-    public static final String GATEWAY_MERCHANT_ID_LABEL = "GatewayMerchantId.label";
-    public static final String GATEWAY_MERCHANT_ID_DESCRIPTION = "GatewayMerchantId.description";
 
     public static final String YES_KEY = "YES";
     public static final String NO_KEY = "NO";
@@ -83,9 +81,6 @@ public class GooglePayConstants {
     public static final String ALLOWED_AUTH_METHOD_KEY = "allowedAuthMethod";
     public static final String ALLOWED_AUTH_METHOD_LABEL = "allowed.auth.method.label";
     public static final String ALLOWED_AUTH_METHOD_DESCRIPTION = "allowed.auth.method.description";
-    public static final String ACTIVATE_NETWORK_CB_KEY = "activateNetworkCB";
-    public static final String ACTIVATE_NETWORK_CB_LABEL = "network.activate.cb.label";
-    public static final String ACTIVATE_NETWORK_CB_DESCRIPTION = "network.activate.cb.description";
     public static final String ACTIVATE_NETWORK_VISA_KEY = "activateNetworkVISA";
     public static final String ACTIVATE_NETWORK_VISA_LABEL = "network.activate.visa.label";
     public static final String ACTIVATE_NETWORK_VISA_DESCRIPTION = "network.activate.visa.description";
