@@ -1,13 +1,10 @@
 package com.payline.payment.google.pay.bean;
 
-import com.google.gson.annotations.SerializedName;
+import org.json.JSONObject;
 
 public class PaymentMethodTokenizationData {
 
-    @SerializedName("type")
     private String type;
-
-    @SerializedName("token")
     private String token;
 
     public PaymentMethodTokenizationData() { }
@@ -19,5 +16,28 @@ public class PaymentMethodTokenizationData {
     public String getToken() {
         return token;
     }
+
+    public PaymentMethodTokenizationData(PaymentMethodTokenizationData.Builder builder) {
+        this.type = builder.type;
+        this.token = builder.token;
+    }
+
+    //******************************************************************************************************************
+    //***** BUILDER
+    public static final class Builder {
+        private String type;
+        private String token;
+
+        public PaymentMethodTokenizationData fromJson(String jsonContent) {
+            JSONObject jo = new JSONObject(jsonContent);
+
+            this.type = jo.getString("type");
+            this.token = jo.getString("token");
+
+            return new PaymentMethodTokenizationData(this);
+        }
+    }
+    //***** BUILDER
+    //******************************************************************************************************************
 
 }

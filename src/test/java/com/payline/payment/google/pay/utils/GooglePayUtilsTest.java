@@ -6,38 +6,37 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
-import java.util.Objects;
-
-import static com.payline.payment.google.pay.utils.GooglePayUtils.createStringAmount;
 
 public class GooglePayUtilsTest {
 
     @Test
     public void decryptFromGoogleTest() throws GeneralSecurityException {
         String expectedPan = "4111111111111111";
-        String encryptedData = "{\"signature\":\"MEUCIC0q4hi1OtbiUYvw+FotWD5dUGNdUxbaUvHROEPV6ZX8AiEA91a8uBCdwvOpSfd2yeKD9EKaH9cSvJq+kTfzYFTCrlU\\u003d\",\"protocolVersion\":\"ECv1\",\"signedMessage\":\"{\\\"encryptedMessage\\\":\\\"RAdOrfhuZTGxNzjiRdtaBmJsHE7/EjB6kyfj+OjqLCV++E49o3BmzFKUOjtN3LiZsq+aD98ZxZbTpuZyUsH1BNUbqqbuj7ceSlx9Xzb6eThRUK6ywPiJdFHyM4IL79WT0VK4ptesBCHXnGFitxBN3x7P1Muz3K5iLtYgTQaCHHRqaL3MTVJ4eqMc0xFHWxKI6QthmBeWFxCWMpsplKJycL2K1t8QmhTsT41hrDa/QVJxa3xFwVAJEyKgz7/hidf6mMaP3xA7Dq5xq3GTx4EZtoRS03NIZGEgDxNd3ETQcffibezKw+QPYZUkFRExCrZO7EkdXIgmtn1Md9BfEefyh3jjX6IuS9v12P+WXYFzVtlb8Q5VixVM/nexREcPccVBZfvHr9OcHa4cJF8E1uIx2r7EjcexecQx8s2ZrnzuPmq8/Uvn6IrMPrrEjrvEPBbXkYuFxgYz/rCf3+xO\\\",\\\"ephemeralPublicKey\\\":\\\"BNcpODTW3F1F5c5h1ewf3Nohhju+ruYp+mHwM1pcYJe13Nx3TtyKk3K3scuQKlL+hQOFNDGvHjNr8Hq2xaqty1Q\\\\u003d\\\",\\\"tag\\\":\\\"ZbrJBSEZ6ydQcL6wlEoK7Hnez0iGHNUBVrAPlAP9Gew\\\\u003d\\\"}\"}";
+
+        // this variable expires after few weeks
+        String encryptedData = "{\"signature\":\"MEQCIC0g11eOLFWN11I7iv//mUWnOwIxNNJYepmm5qhL4OvTAiBNeDjYNrWRg3Zy6tdMnVYcDSKZlWUpT8erzPeJSBLUkA\\u003d\\u003d\",\"protocolVersion\":\"ECv1\",\"signedMessage\":\"{\\\"encryptedMessage\\\":\\\"0OXR1nFR7W/lhiijdU1anG8Ep5oPSVqaYmSf0USqcCA/2sIKwcaXS9MKQids55xIuBCf0F2YEIAyagc95FuixFRrcUkyYbrNM5HEUjt0JkaDKzHr7RoqmE+f8hmQMOV7g+i1M96fwMhai1KiRbuM5MF4+wKu8EhK3DRB95Zv7G9kn01AHFU1LEyJvRuZivBJiHSShj0hs2+r+HX3tkUat1YVO+Uu/MVvAam1gD0SpWvGbhAkgJu6eAHqd/cu79/UHFDVwuwguOcrw0VonxO4B6w0K4CefUeoQZRLgtto+49XYp9oDbMbZz9ad7k1R2dYkkdulYFLt7bU589XtrY3JJw+z9bTtK9eabvn3T85kg5VrgiR637GEppwLlr2GvDsB++5EcK+hf5+n3vM8b/Ehr4+U5W62JuPt79lMeZ7zAhnRZkq/kMbKhfZGxtyvc9nWppxHZatv7akNcE/\\\",\\\"ephemeralPublicKey\\\":\\\"BBRYW4Nmc1oRQ2kvo/1Rsk0HRvWZ9GFtxqCrHj8NIEahOzK5WiMVCy3UakHuhgnnVzMv3om6dA93U/EKNacU1z0\\\\u003d\\\",\\\"tag\\\":\\\"gIGF1RJSkV+3V+xyB7bbO+/+CNalMGsZt/GT0/wlITM\\\\u003d\\\"}\"}";
 
         String jsonEncryptedPaymentData = GooglePayUtils.decryptFromGoogle(encryptedData, Utils.PRIVATE_KEY, true);
         DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
 
-        Assert.assertTrue(Objects.nonNull(decryptedPaymentData));
+        Assert.assertNotNull(decryptedPaymentData);
+        Assert.assertNotNull(decryptedPaymentData.getPaymentMethodDetails());
         Assert.assertEquals(expectedPan, decryptedPaymentData.getPaymentMethodDetails().getPan());
     }
 
 
-
     @Test
-    public void createStringAmont(){
+    public void createStringAmount() {
         BigInteger int1 = BigInteger.ZERO;
         BigInteger int2 = BigInteger.ONE;
         BigInteger int3 = BigInteger.TEN;
         BigInteger int4 = BigInteger.valueOf(100);
         BigInteger int5 = BigInteger.valueOf(1000);
 
-        Assert.assertEquals("0.00", createStringAmount(int1));
-        Assert.assertEquals("0.01", createStringAmount(int2));
-        Assert.assertEquals("0.10", createStringAmount(int3));
-        Assert.assertEquals("1.00", createStringAmount(int4));
-        Assert.assertEquals("10.00", createStringAmount(int5));
+        Assert.assertEquals("0.00", GooglePayUtils.createStringAmount(int1));
+        Assert.assertEquals("0.01", GooglePayUtils.createStringAmount(int2));
+        Assert.assertEquals("0.10", GooglePayUtils.createStringAmount(int3));
+        Assert.assertEquals("1.00", GooglePayUtils.createStringAmount(int4));
+        Assert.assertEquals("10.00", GooglePayUtils.createStringAmount(int5));
     }
 }

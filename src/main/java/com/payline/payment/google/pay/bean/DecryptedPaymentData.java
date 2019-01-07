@@ -1,49 +1,65 @@
 package com.payline.payment.google.pay.bean;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
+import org.json.JSONObject;
 
 public class DecryptedPaymentData {
 
- @SerializedName("messageExpiration")
- private String messageExpiration;
+    private String messageExpiration;
+    private String messageId;
+    private String paymentMethod;
+    private DecryptedPaymentMethodDetails paymentMethodDetails;
 
- @SerializedName("messageId")
- private String messageId;
+    public DecryptedPaymentData() {
+    }
 
- @SerializedName("paymentMethod")
- private String paymentMethod;
+    public String getMessageExpiration() {
+        return messageExpiration;
+    }
 
- @SerializedName("paymentMethodDetails")
- private DecryptedPaymentMethodDetails paymentMethodDetails;
+    public String getMessageId() {
+        return messageId;
+    }
 
- public DecryptedPaymentData() { }
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
 
- public String getMessageExpiration() {
-  return messageExpiration;
- }
+    public DecryptedPaymentMethodDetails getPaymentMethodDetails() {
+        return paymentMethodDetails;
+    }
 
- public String getMessageId() {
-  return messageId;
- }
+    public DecryptedPaymentData(DecryptedPaymentData.Builder builder) {
+        this.messageExpiration = builder.messageExpiration;
+        this.messageId = builder.messageId;
+        this.paymentMethod = builder.paymentMethod;
+        this.paymentMethodDetails = builder.paymentMethodDetails;
+    }
 
- public String getPaymentMethod() {
-  return paymentMethod;
- }
+    //******************************************************************************************************************
+    //***** BUILDER
+    public static final class Builder {
 
- public DecryptedPaymentMethodDetails getPaymentMethodDetails() {
-  return paymentMethodDetails;
- }
+        private String messageExpiration;
+        private String messageId;
+        private String paymentMethod;
+        private DecryptedPaymentMethodDetails paymentMethodDetails;
 
- //******************************************************************************************************************
- //***** BUILDER
- public static final class Builder {
-  public DecryptedPaymentData fromJson(String jsonContent ) {
-   Gson gson = new Gson();
-   return gson.fromJson( jsonContent, DecryptedPaymentData.class );
-  }
- }
- //***** BUILDER
- //******************************************************************************************************************
+        public DecryptedPaymentData fromJson(String jsonContent) {
+            JSONObject jo = new JSONObject(jsonContent);
+
+            this.messageExpiration = jo.getString("messageExpiration");
+            this.messageId = jo.getString("messageId");
+            this.paymentMethod = jo.getString("paymentMethod");
+
+            try {
+                this.paymentMethodDetails =  new DecryptedPaymentMethodDetails.Builder().fromJson(String.valueOf(jo.get("paymentMethodDetails")));
+
+            }finally {
+                return new DecryptedPaymentData(this);
+            }
+        }
+    }
+    //***** BUILDER
+    //******************************************************************************************************************
 
 }
