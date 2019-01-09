@@ -112,8 +112,6 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
      */
     private String getInitPaymentJavaScript(PaymentFormConfigurationRequest paymentFormConfigurationRequest) throws IOException {
 
-        String scriptInitPaymentContent = "";
-
         // get info to put in .js
         final Map<String, ContractProperty> properties = paymentFormConfigurationRequest.getContractConfiguration().getContractProperties();
         final String merchantId = properties.get(MERCHANT_ID_KEY).getValue();
@@ -125,10 +123,11 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
         final String buttonType = properties.get(BUTTON_SIZE_KEY).getValue();
         final String buttonColor = properties.get(BUTTON_COLOR_KEY).getValue();
 
+        // get the .js file
         File file = new File(this.getClass().getClassLoader().getResource(JS_RES_INIT_PAYMENT).getFile());
         String rawScriptInitPaymentContent = new String(Files.readAllBytes(file.toPath()));
 
-        scriptInitPaymentContent = rawScriptInitPaymentContent
+        String scriptInitPaymentContent = rawScriptInitPaymentContent
                 .replace(JS_PARAM_TAG_ALLOWED_CARD_NETWORKS, getAllowedCards(properties))
                 .replace(JS_PARAM_TAG_ALLOWED_AUTH_METHODS, getAllowedAuthMethod(properties))
                 .replace(JS_PARAM_TAG_TYPE, JS_PARAM_VALUE_TYPE)

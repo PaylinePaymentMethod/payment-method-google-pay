@@ -2,6 +2,10 @@ package com.payline.payment.google.pay.bean;
 
 import org.json.JSONObject;
 
+import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_BILLING_ADRESS;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_CARD_DETAILS;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_CARD_NETWORK;
+
 public class CardInfo {
 
     private String cardNetwork;
@@ -28,22 +32,18 @@ public class CardInfo {
 
     //******************************************************************************************************************
     //***** BUILDER
-    public static final class Builder {
+    public static final class Builder extends JsonBean {
         private String cardNetwork;
         private String cardDetails;
         private BillingAddress billingAddress;
 
-        public CardInfo fromJson(String jsonContent) {
-            JSONObject jo = new JSONObject(jsonContent);
+        public CardInfo fromJson(JSONObject jo) {
 
-            this.cardNetwork = jo.getString("cardNetwork");
-            this.cardDetails = jo.getString("cardDetails");
-            try {
-                this.billingAddress = new BillingAddress.Builder().fromJson(String.valueOf(jo.get("billingAddress")));
-            }finally {
-                return new CardInfo(this);
-            }
+            this.cardNetwork = getString(jo, BEAN_CARD_NETWORK);
+            this.cardDetails = getString(jo, BEAN_CARD_DETAILS);
+            this.billingAddress = new BillingAddress.Builder().fromJson(getJSONObject(jo,BEAN_BILLING_ADRESS));
 
+            return new CardInfo(this);
         }
     }
     //***** BUILDER

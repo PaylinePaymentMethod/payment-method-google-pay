@@ -2,6 +2,8 @@ package com.payline.payment.google.pay.bean;
 
 import org.json.JSONObject;
 
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+
 public class DecryptedPaymentData {
 
     private String messageExpiration;
@@ -37,7 +39,7 @@ public class DecryptedPaymentData {
 
     //******************************************************************************************************************
     //***** BUILDER
-    public static final class Builder {
+    public static final class Builder extends JsonBean {
 
         private String messageExpiration;
         private String messageId;
@@ -47,16 +49,12 @@ public class DecryptedPaymentData {
         public DecryptedPaymentData fromJson(String jsonContent) {
             JSONObject jo = new JSONObject(jsonContent);
 
-            this.messageExpiration = jo.getString("messageExpiration");
-            this.messageId = jo.getString("messageId");
-            this.paymentMethod = jo.getString("paymentMethod");
+            this.messageExpiration = getString(jo, BEAN_MESSAGE_EXPIRATION);
+            this.messageId = getString(jo, BEAN_MESSAGE_ID);
+            this.paymentMethod = getString(jo, BEAN_PAYMENT_METHOD);
+            this.paymentMethodDetails = new DecryptedPaymentMethodDetails.Builder().fromJson(getJSONObject(jo,BEAN_PAYMENT_METHOD_DETAILS));
 
-            try {
-                this.paymentMethodDetails =  new DecryptedPaymentMethodDetails.Builder().fromJson(String.valueOf(jo.get("paymentMethodDetails")));
-
-            }finally {
-                return new DecryptedPaymentData(this);
-            }
+            return new DecryptedPaymentData(this);
         }
     }
     //***** BUILDER

@@ -7,6 +7,34 @@ public class GooglePayConstants {
 
     public static final String I18N_SERVICE_DEFAULT_LOCALE = "en";
 
+    // fields used in Beans
+    public static final String BEAN_PHONE_NUMBER = "phoneNumber";
+    public static final String BEAN_COUNTRY_CODE = "countryCode";
+    public static final String BEAN_POSTAL_CODE = "postalCode";
+    public static final String BEAN_NAME = "name";
+    public static final String BEAN_CARD_NETWORK = "cardNetwork";
+    public static final String BEAN_CARD_DETAILS = "cardDetails";
+    public static final String BEAN_BILLING_ADRESS = "billingAddress";
+    public static final String BEAN_MESSAGE_EXPIRATION = "messageExpiration";
+    public static final String BEAN_MESSAGE_ID ="messageId";
+    public static final String BEAN_PAYMENT_METHOD = "paymentMethod";
+    public static final String BEAN_PAYMENT_METHOD_DETAILS = "paymentMethodDetails";
+    public static final String BEAN_AUTH_METHOD = "authMethod";
+    public static final String BEAN_PAN ="pan";
+    public static final String BEAN_EXPIRATION_MONTH = "expirationMonth";
+    public static final String BEAN_EXPIRATION_YEAR = "expirationYear";
+    public static final String BEAN_CRYPTOGRAM = "cryptogram";
+    public static final String BEAN_ECI_INDICATOR = "eciIndicator";
+    public static final String BEAN_API_VERSION = "apiVersion";
+    public static final String BEAN_API_VERSION_MINOR = "apiVersionMinor";
+    public static final String BEAN_EMAIL = "email";
+    public static final String BEAN_PAYMENT_METHOD_DATA = "paymentMethodData";
+    public static final String BEAN_TYPE = "type";
+    public static final String BEAN_DESCRIPTION ="description";
+    public static final String BEAN_INFO = "info";
+    public static final String BEAN_TOKENIZATION_DATA = "tokenizationData";
+    public static final String BEAN_TOKEN = "token";
+
     // data used is js file
     public static final String JS_PARAM_TAG_ALLOWED_CARD_NETWORKS = "${allowedCardNetworks}";
     public static final String JS_PARAM_TAG_ALLOWED_AUTH_METHODS = "${allowedCardAuthMethods}";

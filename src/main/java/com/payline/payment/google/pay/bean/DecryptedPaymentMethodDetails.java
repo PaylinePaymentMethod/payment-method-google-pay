@@ -2,6 +2,8 @@ package com.payline.payment.google.pay.bean;
 
 import org.json.JSONObject;
 
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+
 public class DecryptedPaymentMethodDetails {
 
     private String authMethod;
@@ -11,7 +13,8 @@ public class DecryptedPaymentMethodDetails {
     private String cryptogram;
     private String eciIndicator;
 
-    public DecryptedPaymentMethodDetails() { }
+    public DecryptedPaymentMethodDetails() {
+    }
 
     public String getAuthMethod() {
         return authMethod;
@@ -48,7 +51,7 @@ public class DecryptedPaymentMethodDetails {
 
     //******************************************************************************************************************
     //***** BUILDER
-    public static final class Builder {
+    public static final class Builder extends JsonBean {
         private String authMethod;
         private String pan;
         private int expirationMonth;
@@ -56,32 +59,16 @@ public class DecryptedPaymentMethodDetails {
         private String cryptogram;
         private String eciIndicator;
 
+        public DecryptedPaymentMethodDetails fromJson(JSONObject jo) {
 
-        public DecryptedPaymentMethodDetails fromJson(String jsonContent) {
-            JSONObject jo = new JSONObject(jsonContent);
-
-            try{
-                this.authMethod = jo.getString("authMethod");
-            } catch (Exception e){
-
-            }
-            this.pan = jo.getString("pan");
-            this.expirationMonth = jo.getInt("expirationMonth");
-            this.expirationYear = jo.getInt("expirationYear");
-            try{
-                this.cryptogram = jo.getString("cryptogram");
-            } catch (Exception e){
-
-            }
-
-            try {
-                this.eciIndicator = jo.getString("eciIndicator");
-            }catch (Exception e ){
-
-            }
+            this.authMethod = getString(jo, BEAN_AUTH_METHOD);
+            this.pan = getString(jo, BEAN_PAN);
+            this.expirationMonth = getInt(jo, BEAN_EXPIRATION_MONTH);
+            this.expirationYear = getInt(jo, BEAN_EXPIRATION_YEAR);
+            this.cryptogram = getString(jo, BEAN_CRYPTOGRAM);
+            this.eciIndicator = jo.getString(BEAN_ECI_INDICATOR);
 
             return new DecryptedPaymentMethodDetails(this);
-
         }
     }
     //***** BUILDER

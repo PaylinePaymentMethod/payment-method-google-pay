@@ -2,6 +2,8 @@ package com.payline.payment.google.pay.bean;
 
 import org.json.JSONObject;
 
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+
 public class PaymentMethodData {
 
     private String type;
@@ -37,25 +39,20 @@ public class PaymentMethodData {
 
     //******************************************************************************************************************
     //***** BUILDER
-    public static final class Builder {
+    public static final class Builder extends JsonBean {
         private String type;
         private String description;
         private CardInfo info;
         private PaymentMethodTokenizationData tokenizationData;
 
-        public PaymentMethodData fromJson(String jsonContent) {
-            JSONObject jo = new JSONObject(jsonContent);
+        public PaymentMethodData fromJson(JSONObject jo) {
 
-            this.type = jo.getString("type");
-            this.description = jo.getString("description");
-            this.info = new CardInfo.Builder().fromJson(String.valueOf(jo.get("info")));
+            this.type = getString(jo,BEAN_TYPE);
+            this.description = getString(jo,BEAN_DESCRIPTION);
+            this.info = new CardInfo.Builder().fromJson(getJSONObject(jo,BEAN_INFO));
+            this.tokenizationData = new PaymentMethodTokenizationData.Builder().fromJson(getJSONObject(jo,BEAN_TOKENIZATION_DATA));
 
-            try {
-                this.tokenizationData = new PaymentMethodTokenizationData.Builder().fromJson(String.valueOf(jo.get("tokenizationData")));
-            } finally {
-                return new PaymentMethodData(this);
-            }
-
+            return new PaymentMethodData(this);
         }
     }
     //***** BUILDER

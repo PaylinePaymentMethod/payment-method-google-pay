@@ -2,21 +2,23 @@ package com.payline.payment.google.pay.bean;
 
 import org.json.JSONObject;
 
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+
 public class PaymentData {
 
-    private String apiVersion;
-    private String apiVersionMinor;
+    private int apiVersion;
+    private int apiVersionMinor;
     private PaymentMethodData paymentMethodData;
     private String email;
 
     public PaymentData() {
     }
 
-    public String getApiVersion() {
+    public int getApiVersion() {
         return apiVersion;
     }
 
-    public String getApiVersionMinor() {
+    public int getApiVersionMinor() {
         return apiVersionMinor;
     }
 
@@ -37,23 +39,22 @@ public class PaymentData {
 
     //******************************************************************************************************************
     //***** BUILDER
-    public static final class Builder {
-        private String apiVersion;
-        private String apiVersionMinor;
+    public static final class Builder extends JsonBean {
+        private int apiVersion;
+        private int apiVersionMinor;
         private PaymentMethodData paymentMethodData;
         private String email;
 
 
         public PaymentData fromJson(String jsonContent) {
             JSONObject jo = new JSONObject(jsonContent);
-            this.apiVersion = String.valueOf( jo.get("apiVersion"));
-            this.apiVersionMinor = String.valueOf( jo.get("apiVersionMinor"));
-            this.email = jo.getString("email");
-            try {
-                this.paymentMethodData = new PaymentMethodData.Builder().fromJson(String.valueOf( jo.get("paymentMethodData")));
-            } finally {
-                return new PaymentData(this);
-            }
+            this.apiVersion = getInt(jo, BEAN_API_VERSION);
+            this.apiVersionMinor = getInt(jo, BEAN_API_VERSION_MINOR);
+            this.email = getString(jo, BEAN_EMAIL);
+            this.paymentMethodData = new PaymentMethodData.Builder().fromJson(getJSONObject(jo, BEAN_PAYMENT_METHOD_DATA));
+
+            return new PaymentData(this);
+
         }
     }
     //***** BUILDER

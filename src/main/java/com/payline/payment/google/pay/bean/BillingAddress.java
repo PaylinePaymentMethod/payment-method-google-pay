@@ -2,6 +2,8 @@ package com.payline.payment.google.pay.bean;
 
 import org.json.JSONObject;
 
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+
 public class BillingAddress {
 
     private String phoneNumber;
@@ -34,19 +36,18 @@ public class BillingAddress {
 
     //******************************************************************************************************************
     //***** BUILDER
-    public static final class Builder {
+    public static final class Builder extends JsonBean {
         private String phoneNumber;
         private String countryCode;
         private String postalCode;
         private String name;
 
-        public BillingAddress fromJson(String jsonContent) {
-            JSONObject jo = new JSONObject(jsonContent);
+        public BillingAddress fromJson(JSONObject jo) {
 
-            this.phoneNumber = jo.getString("phoneNumber");
-            this.countryCode = jo.getString("countryCode");
-            this.postalCode = jo.getString("postalCode");
-            this.name = jo.getString("name");
+            this.phoneNumber = getString(jo, BEAN_PHONE_NUMBER);
+            this.countryCode = getString(jo, BEAN_COUNTRY_CODE);
+            this.postalCode = getString(jo, BEAN_POSTAL_CODE);
+            this.name = getString(jo, BEAN_NAME);
 
             return new BillingAddress(this);
         }

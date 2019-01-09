@@ -2,6 +2,9 @@ package com.payline.payment.google.pay.bean;
 
 import org.json.JSONObject;
 
+import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_TOKEN;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_TYPE;
+
 public class PaymentMethodTokenizationData {
 
     private String type;
@@ -28,11 +31,9 @@ public class PaymentMethodTokenizationData {
         private String type;
         private String token;
 
-        public PaymentMethodTokenizationData fromJson(String jsonContent) {
-            JSONObject jo = new JSONObject(jsonContent);
-
-            this.type = jo.getString("type");
-            this.token = jo.getString("token");
+        public PaymentMethodTokenizationData fromJson(JSONObject jo) {
+            this.type = jo.getString(BEAN_TYPE);
+            this.token = jo.getString(BEAN_TOKEN);
 
             return new PaymentMethodTokenizationData(this);
         }
