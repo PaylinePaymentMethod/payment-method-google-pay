@@ -9,11 +9,12 @@ import com.payline.pmapi.service.NotificationService;
 public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationResponse parse(NotificationRequest notificationRequest) {
+        // Not used by GooglePay
         return new IgnoreNotificationResponse();
     }
 
     @Override
     public void notifyTransactionStatus(NotifyTransactionStatusRequest notifyTransactionStatusRequest) {
-    // Not used by this payment type
+        // Not used by this payment type
     }
 }

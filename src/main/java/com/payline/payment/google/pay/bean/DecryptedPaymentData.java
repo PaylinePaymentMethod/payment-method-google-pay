@@ -1,84 +1,63 @@
 package com.payline.payment.google.pay.bean;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
+import org.json.JSONObject;
+
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
 public class DecryptedPaymentData {
 
- @SerializedName("messageExpiration")
- private String messageExpiration;
+    private String messageExpiration;
+    private String messageId;
+    private String paymentMethod;
+    private DecryptedPaymentMethodDetails paymentMethodDetails;
 
- @SerializedName("messageId")
- private String messageId;
+    public DecryptedPaymentData() {
+    }
 
- @SerializedName("paymentMethod")
- private String paymentMethod;
+    public String getMessageExpiration() {
+        return messageExpiration;
+    }
 
- @SerializedName("paymentMethodDetails")
- private DecryptedPaymentMethodDetails paymentMethodDetails;
+    public String getMessageId() {
+        return messageId;
+    }
 
- public DecryptedPaymentData() { }
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
 
- public String getMessageExpiration() {
-  return messageExpiration;
- }
+    public DecryptedPaymentMethodDetails getPaymentMethodDetails() {
+        return paymentMethodDetails;
+    }
 
- public void setMessageExpiration(String messageExpiration) {
-  this.messageExpiration = messageExpiration;
- }
+    public DecryptedPaymentData(DecryptedPaymentData.Builder builder) {
+        this.messageExpiration = builder.messageExpiration;
+        this.messageId = builder.messageId;
+        this.paymentMethod = builder.paymentMethod;
+        this.paymentMethodDetails = builder.paymentMethodDetails;
+    }
 
- public String getMessageId() {
-  return messageId;
- }
+    //******************************************************************************************************************
+    //***** BUILDER
+    public static final class Builder extends JsonBean {
 
- public void setMessageId(String messageId) {
-  this.messageId = messageId;
- }
+        private String messageExpiration;
+        private String messageId;
+        private String paymentMethod;
+        private DecryptedPaymentMethodDetails paymentMethodDetails;
 
- public String getPaymentMethod() {
-  return paymentMethod;
- }
+        public DecryptedPaymentData fromJson(String jsonContent) {
+            JSONObject jo = new JSONObject(jsonContent);
 
- public void setPaymentMethod(String paymentMethod) {
-  this.paymentMethod = paymentMethod;
- }
+            this.messageExpiration = getString(jo, BEAN_MESSAGE_EXPIRATION);
+            this.messageId = getString(jo, BEAN_MESSAGE_ID);
+            this.paymentMethod = getString(jo, BEAN_PAYMENT_METHOD);
+            this.paymentMethodDetails = new DecryptedPaymentMethodDetails.Builder().fromJson(getJSONObject(jo,BEAN_PAYMENT_METHOD_DETAILS));
 
- public DecryptedPaymentMethodDetails getPaymentMethodDetails() {
-  return paymentMethodDetails;
- }
-
- public void setPaymentMethodDetails(DecryptedPaymentMethodDetails paymentMethodDetails) {
-  this.paymentMethodDetails = paymentMethodDetails;
- }
-
- @Override
- public String toString() {
-  final StringBuilder result = new StringBuilder();
-
-  result.append("***** DecryptedPaymentData info\n");
-
-  result.append("messageExpiration : " + messageExpiration + "\n");
-  result.append("messageId : " + messageId + "\n");
-  result.append("paymentMethod : " + paymentMethod + "\n");
-
-  result.append(paymentMethodDetails.toString());
-
-  return result.toString();
- }
-
- public String toJson() {
-  return new Gson().toJson(this);
- }
-
- //******************************************************************************************************************
- //***** BUILDER
- public static final class Builder {
-  public DecryptedPaymentData fromJson(String jsonContent ) {
-   Gson gson = new Gson();
-   return gson.fromJson( jsonContent, DecryptedPaymentData.class );
-  }
- }
- //***** BUILDER
- //******************************************************************************************************************
+            return new DecryptedPaymentData(this);
+        }
+    }
+    //***** BUILDER
+    //******************************************************************************************************************
 
 }

@@ -1,89 +1,77 @@
 package com.payline.payment.google.pay.bean;
 
-import com.google.gson.annotations.SerializedName;
+import org.json.JSONObject;
+
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
 public class DecryptedPaymentMethodDetails {
 
-    @SerializedName("authMethod")
     private String authMethod;
-
-    @SerializedName("pan")
     private String pan;
-
-    @SerializedName("expirationMonth")
     private int expirationMonth;
-
-    @SerializedName("expirationYear")
     private int expirationYear;
-
-    @SerializedName("cryptogram")
     private String cryptogram;
-
-    @SerializedName("eciIndicator")
     private String eciIndicator;
 
-    public DecryptedPaymentMethodDetails() { }
+    public DecryptedPaymentMethodDetails() {
+    }
 
     public String getAuthMethod() {
         return authMethod;
-    }
-
-    public void setAuthMethod(String authMethod) {
-        this.authMethod = authMethod;
     }
 
     public String getPan() {
         return pan;
     }
 
-    public void setPan(String pan) {
-        this.pan = pan;
-    }
-
     public int getExpirationMonth() {
         return expirationMonth;
-    }
-
-    public void setExpirationMonth(int expirationMonth) {
-        this.expirationMonth = expirationMonth;
     }
 
     public int getExpirationYear() {
         return expirationYear;
     }
 
-    public void setExpirationYear(int expirationYear) {
-        this.expirationYear = expirationYear;
-    }
-
     public String getCryptogram() {
         return cryptogram;
-    }
-
-    public void setCryptogram(String cryptogram) {
-        this.cryptogram = cryptogram;
     }
 
     public String getEciIndicator() {
         return eciIndicator;
     }
 
-    public void setEciIndicator(String eciIndicator) {
-        this.eciIndicator = eciIndicator;
+    public DecryptedPaymentMethodDetails(DecryptedPaymentMethodDetails.Builder builder) {
+        this.authMethod = builder.authMethod;
+        this.pan = builder.pan;
+        this.expirationMonth = builder.expirationMonth;
+        this.expirationYear = builder.expirationYear;
+        this.cryptogram = builder.cryptogram;
+        this.eciIndicator = builder.eciIndicator;
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder result = new StringBuilder();
+    //******************************************************************************************************************
+    //***** BUILDER
+    public static final class Builder extends JsonBean {
+        private String authMethod;
+        private String pan;
+        private int expirationMonth;
+        private int expirationYear;
+        private String cryptogram;
+        private String eciIndicator;
 
-        result.append("authMethod : " + authMethod + "\n");
-        result.append("pan : " + pan + "\n");
-        result.append("expirationMonth : " + expirationMonth + "\n");
-        result.append("expirationYear : " + expirationYear + "\n");
-        result.append("cryptogram : " + cryptogram + "\n");
-        result.append("eciIndicator : " + eciIndicator + "\n");
+        public DecryptedPaymentMethodDetails fromJson(JSONObject jo) {
 
-        return result.toString();
+            this.authMethod = getString(jo, BEAN_AUTH_METHOD);
+            this.pan = getString(jo, BEAN_PAN);
+            this.expirationMonth = getInt(jo, BEAN_EXPIRATION_MONTH);
+            this.expirationYear = getInt(jo, BEAN_EXPIRATION_YEAR);
+            this.cryptogram = getString(jo, BEAN_CRYPTOGRAM);
+            this.eciIndicator = jo.getString(BEAN_ECI_INDICATOR);
+
+            return new DecryptedPaymentMethodDetails(this);
+        }
     }
+    //***** BUILDER
+    //******************************************************************************************************************
 
 }
