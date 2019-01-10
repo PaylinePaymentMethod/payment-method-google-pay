@@ -3,11 +3,8 @@ package com.payline.payment.google.pay.utils;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.configuration.PartnerConfiguration;
-import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.*;
-import com.payline.pmapi.bean.payment.request.NotifyTransactionStatusRequest;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
-import com.payline.pmapi.bean.payment.request.TransactionStatusRequest;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormConfigurationRequest;
 
 import java.math.BigInteger;
@@ -15,7 +12,6 @@ import java.util.*;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
-// todo bien relire et nettoyer ce fichier
 public class Utils {
     private static final Locale FRENCH = Locale.FRENCH;
     private static final String EUR = "EUR";
@@ -24,31 +20,9 @@ public class Utils {
     public static final String NOTIFICATION_URL = "http://notificationurl.com/";
     public static final String AUTH_URL = "http://authenticationurl.com/";
 
-    public static final String MERCHANT_NAME_VAL = ""; // todo
-    public static final String MERCHANT_ID_VAL = ""; // todo
-    public static final String GATEWAY_MERCHANT_ID_VAL = ""; // todo
-    public static final String PRIVATE_KEY = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgSaq46Z66YlV9Gp/B0WfRB7b4deHKeSE/kSDPI7+5Dw2hRANCAAQD5EWZSKBoQTlspL9hpHFfBvGUhSubJC/dF0uTPKTTwuo2fb+t/kUY2ZJJyuJWI4b9qqLBVxmye359mZAfQNCY";
-
-
-    public static ContractParametersCheckRequest createContractParametersCheckRequest() {
-        return createContractParametersCheckRequestBuilder().build();
-    }
-
-    public static ContractParametersCheckRequest.CheckRequestBuilder createContractParametersCheckRequestBuilder() {
-        Map<String, String> accountInfo = new HashMap<>();
-//        accountInfo.put(CONTRACT_CONFIG_MERCHANT_NAME, merchantName);
-
-        ContractConfiguration configuration = createContractConfiguration();
-        Environment environment = createDefaultPaylineEnvironment();
-
-        return ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
-                .withAccountInfo(accountInfo)
-                .withLocale(FRENCH)
-                .withContractConfiguration(configuration)
-                .withEnvironment(environment)
-                .withPartnerConfiguration(createDefaultPartnerConfiguration());
-
-    }
+    public static final String MERCHANT_NAME_VAL = "monext";
+    public static final String MERCHANT_ID_VAL = "monext";
+    public static final String TEST_PRIVATE_KEY = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgSaq46Z66YlV9Gp/B0WfRB7b4deHKeSE/kSDPI7+5Dw2hRANCAAQD5EWZSKBoQTlspL9hpHFfBvGUhSubJC/dF0uTPKTTwuo2fb+t/kUY2ZJJyuJWI4b9qqLBVxmye359mZAfQNCY";
 
     public static PaymentRequest.Builder createCompletePaymentBuilder() {
         final Amount amount = createAmount(EUR);
@@ -62,7 +36,7 @@ public class Utils {
 
         Map<String, String> configMap = new HashMap();
         Map<String, String> configSensitiveMap = new HashMap();
-        configSensitiveMap.put(PRIVATE_KEY_PATH, PRIVATE_KEY);
+        configSensitiveMap.put(PRIVATE_KEY_PATH, TEST_PRIVATE_KEY);
         final PartnerConfiguration configuration = new PartnerConfiguration(configMap, configSensitiveMap);
 
         return PaymentRequest.builder()
@@ -103,12 +77,7 @@ public class Utils {
         return Order.OrderBuilder.anOrder().withReference(transactionID).build();
     }
 
-    public static Order createOrder(String transactionID, Amount amount) {
-        return Order.OrderBuilder.anOrder().withReference(transactionID).withAmount(amount).build();
-    }
-
     private static Buyer.FullName createFullName() {
-//        return new Buyer.FullName("foo", "bar", );
         return new Buyer.FullName("foo", "bar", "UNKNOWN");
     }
 
@@ -168,7 +137,6 @@ public class Utils {
 
     public static PartnerConfiguration createDefaultPartnerConfiguration() {
         Map<String, String> partnerConfigMap = new HashMap<>();
-//        partnerConfigMap.put(SamsungPayConstants.PARTNER_CONFIG_SERVICE_ID, SERVICE_ID);
         return new PartnerConfiguration(partnerConfigMap, new HashMap<>());
     }
 
@@ -181,33 +149,6 @@ public class Utils {
                 .withOrder(createOrder("007"))
                 .withEnvironment(createDefaultPaylineEnvironment())
                 .withPartnerConfiguration(createDefaultPartnerConfiguration())
-                .build();
-    }
-
-    public static NotifyTransactionStatusRequest createNotifyTransactionRequest() {
-        return createNotifyTransactionRequestBuilder().build();
-    }
-
-    public static NotifyTransactionStatusRequest.NotifyTransactionStatusRequestBuilder createNotifyTransactionRequestBuilder() {
-        return NotifyTransactionStatusRequest.NotifyTransactionStatusRequestBuilder.aNotifyTransactionStatusRequest()
-                .withPartnerTransactionId("1")
-                .withTransactionSatus(NotifyTransactionStatusRequest.TransactionStatus.SUCCESS)
-                .withAmount(createAmount(EUR))
-                .withContractConfiguration(createContractConfiguration())
-                .withEnvironment(createDefaultPaylineEnvironment())
-                .withPartnerConfiguration(createDefaultPartnerConfiguration());
-    }
-
-    public static TransactionStatusRequest createTransactionStatusRequest() {
-        String transactionId = createTransactionId();
-        return TransactionStatusRequest.TransactionStatusRequestBuilder.aNotificationRequest()
-                .withAmount(createAmount(EUR))
-                .withOrder(createOrder(transactionId))
-                .withBuyer(createDefaultBuyer())
-                .withEnvironment(createDefaultPaylineEnvironment())
-                .withPartnerConfiguration(createDefaultPartnerConfiguration())
-                .withContractConfiguration(createContractConfiguration())
-                .withTransactionId(transactionId)
                 .build();
     }
 }
