@@ -15,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.security.GeneralSecurityException;
 
+import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENTDATA_TOKENDATA;
 import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENT_REQUEST_PAYMENT_DATA_KEY;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -38,6 +39,26 @@ public class PaymentServiceImplTest {
     public void paymentRequest() throws GeneralSecurityException {
         PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPartnerConfiguration().getSensitiveProperties().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
+
+        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
+
+        PaymentResponse response = service.paymentRequest(request);
+
+        Assert.assertNotNull(response);
+        Assert.assertEquals(PaymentResponseDoPayment.class, response.getClass());
+        PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
+        Assert.assertEquals(PaymentModeCard.class, responseDoPayment.getPaymentMode().getClass());
+        PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
+
+        Assert.assertEquals(PAN, modeCard.getCard().getPan());
+        Assert.assertEquals(BRAND_VISA, modeCard.getCard().getBrand());
+        Assert.assertEquals(NAME, modeCard.getCard().getHolder());
+    }
+
+    @Test
+    public void paymentRequestDirectMode() throws GeneralSecurityException {
+        PaymentRequest request = Utils.createCompletePaymentBuilder().build();
+        request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENTDATA_TOKENDATA, GOOD_PAYMENT_DATA);
 
         doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
 

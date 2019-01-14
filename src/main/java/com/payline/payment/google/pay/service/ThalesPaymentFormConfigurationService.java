@@ -37,7 +37,7 @@ public interface ThalesPaymentFormConfigurationService extends PaymentFormConfig
                     .withAlt(i18n.getMessage(props.getProperty(LOGO_ALT), paymentFormLogoRequest.getLocale()))
                     .build();
         } catch (IOException e) {
-            LOGGER.error("An error occurred reading the file logo.properties {}", e.getMessage(), e);
+            LOGGER.error("An error occurred reading the file logo.properties", e);
             throw new RuntimeException("Failed to reading file logo.properties: ", e);
 
         }
@@ -49,7 +49,7 @@ public interface ThalesPaymentFormConfigurationService extends PaymentFormConfig
         try {
             props.load(ConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(LOGO_PROPERTIES));
         } catch (IOException e) {
-            LOGGER.error("An error occurred reading the file logo.properties {}", e.getMessage(), e);
+            LOGGER.error("An error occurred reading the file logo.properties", e);
             throw new RuntimeException("Failed to reading file logo.properties: ", e);
 
         }
@@ -68,7 +68,7 @@ public interface ThalesPaymentFormConfigurationService extends PaymentFormConfig
                     .withContentType(props.getProperty(LOGO_CONTENT_TYPE))
                     .build();
         } catch (IOException e) {
-            LOGGER.error("Unable to load the logo {}", e.getMessage(), e);
+            LOGGER.error("Unable to load the logo", e);
             throw new RuntimeException(e);
         }
     }
