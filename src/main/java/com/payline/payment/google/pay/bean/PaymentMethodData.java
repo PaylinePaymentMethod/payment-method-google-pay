@@ -1,66 +1,61 @@
 package com.payline.payment.google.pay.bean;
 
-import com.google.gson.annotations.SerializedName;
+import org.json.JSONObject;
+
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
 public class PaymentMethodData {
 
-    @SerializedName("type")
     private String type;
-
-    @SerializedName("description")
     private String description;
-
-    @SerializedName("info")
     private CardInfo info;
-
-    @SerializedName("tokenizationData")
     private PaymentMethodTokenizationData tokenizationData;
 
-    public PaymentMethodData() { }
+    public PaymentMethodData() {
+    }
 
     public String getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public CardInfo getInfo() {
         return info;
-    }
-
-    public void setInfo(CardInfo info) {
-        this.info = info;
     }
 
     public PaymentMethodTokenizationData getTokenizationData() {
         return tokenizationData;
     }
 
-    public void setTokenizationData(PaymentMethodTokenizationData tokenizationData) {
-        this.tokenizationData = tokenizationData;
+    public PaymentMethodData(PaymentMethodData.Builder builder) {
+        this.type = builder.type;
+        this.description = builder.description;
+        this.info = builder.info;
+        this.tokenizationData = builder.tokenizationData;
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder result = new StringBuilder();
+    //******************************************************************************************************************
+    //***** BUILDER
+    public static final class Builder extends JsonBean {
+        private String type;
+        private String description;
+        private CardInfo info;
+        private PaymentMethodTokenizationData tokenizationData;
 
-        result.append("type : " + type + "\n");
-        result.append("description : " + description + "\n");
+        public PaymentMethodData fromJson(JSONObject jo) {
 
-        result.append(info.toString());
-        result.append(tokenizationData.toString());
+            this.type = getString(jo,BEAN_TYPE);
+            this.description = getString(jo,BEAN_DESCRIPTION);
+            this.info = new CardInfo.Builder().fromJson(getJSONObject(jo,BEAN_INFO));
+            this.tokenizationData = new PaymentMethodTokenizationData.Builder().fromJson(getJSONObject(jo,BEAN_TOKENIZATION_DATA));
 
-        return result.toString();
+            return new PaymentMethodData(this);
+        }
     }
+    //***** BUILDER
+    //******************************************************************************************************************
 
 }

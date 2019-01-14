@@ -1,13 +1,13 @@
 package com.payline.payment.google.pay.bean;
 
-import com.google.gson.annotations.SerializedName;
+import org.json.JSONObject;
+
+import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_TOKEN;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_TYPE;
 
 public class PaymentMethodTokenizationData {
 
-    @SerializedName("type")
     private String type;
-
-    @SerializedName("token")
     private String token;
 
     public PaymentMethodTokenizationData() { }
@@ -16,26 +16,29 @@ public class PaymentMethodTokenizationData {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public String getToken() {
         return token;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public PaymentMethodTokenizationData(PaymentMethodTokenizationData.Builder builder) {
+        this.type = builder.type;
+        this.token = builder.token;
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder result = new StringBuilder();
+    //******************************************************************************************************************
+    //***** BUILDER
+    public static final class Builder {
+        private String type;
+        private String token;
 
-        result.append("type : " + type + "\n");
-        result.append("token : " + token + "\n");
+        public PaymentMethodTokenizationData fromJson(JSONObject jo) {
+            this.type = jo.getString(BEAN_TYPE);
+            this.token = jo.getString(BEAN_TOKEN);
 
-        return result.toString();
+            return new PaymentMethodTokenizationData(this);
+        }
     }
+    //***** BUILDER
+    //******************************************************************************************************************
 
 }

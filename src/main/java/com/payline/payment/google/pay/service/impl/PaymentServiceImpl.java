@@ -1,76 +1,87 @@
 package com.payline.payment.google.pay.service.impl;
 
-import com.google.crypto.tink.apps.paymentmethodtoken.GooglePaymentsPublicKeysManager;
 import com.payline.payment.google.pay.bean.DecryptedPaymentData;
+import com.payline.payment.google.pay.bean.DecryptedPaymentMethodDetails;
 import com.payline.payment.google.pay.bean.PaymentData;
 import com.payline.payment.google.pay.utils.GooglePayUtils;
+import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
+import com.payline.pmapi.bean.payment.response.PaymentData3DS;
 import com.payline.pmapi.bean.payment.response.PaymentModeCard;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
 import com.payline.pmapi.bean.payment.response.buyerpaymentidentifier.Card;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseDoPayment;
+import com.payline.pmapi.bean.payment.response.impl.PaymentResponseFailure;
 import com.payline.pmapi.service.PaymentService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.security.GeneralSecurityException;
 import java.time.YearMonth;
 
-import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENTDATA_TOKENDATA;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENT_REQUEST_PAYMENT_DATA_KEY;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.PRIVATE_KEY_PATH;
 
 public class PaymentServiceImpl implements PaymentService {
 
-    private static final Logger logger = LogManager.getLogger( PaymentServiceImpl.class );
+    private static final Logger LOGGER = LogManager.getLogger(PaymentServiceImpl.class);
 
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
-
-        String jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
-        this.logger.debug("JSON PaymentData :");
-        this.logger.debug(jsonPaymentData);
-
-        PaymentData paymentData = new PaymentData.Builder().fromJson(jsonPaymentData);
-        this.logger.debug("Object PaymentData :");
-        this.logger.debug(paymentData.toString());
-
-        this.logger.debug("Encrypted token : " + paymentData.getPaymentMethodData().getTokenizationData().getToken());
-
-
-        GooglePaymentsPublicKeysManager googlePaymentsPublicKeysManager = GooglePaymentsPublicKeysManager.INSTANCE_TEST;
-
-        if (!paymentRequest.getEnvironment().isSandbox()) {
-            googlePaymentsPublicKeysManager = GooglePaymentsPublicKeysManager.INSTANCE_PRODUCTION;
+        // check if the payment is in direct Mode
+        String jsonPaymentData;
+        if (paymentRequest.getPaymentFormContext().getPaymentFormParameter().containsKey(PAYMENTDATA_TOKENDATA)){
+            jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENTDATA_TOKENDATA);
+        }else{
+            jsonPaymentData = paymentRequest.getPartnerConfiguration().getProperty(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
         }
 
-        String jsonEncryptedPaymentData = GooglePayUtils.decryptFromGoogle(
-                paymentData.getPaymentMethodData().getTokenizationData().getToken(),
-                googlePaymentsPublicKeysManager
-        );
-        this.logger.debug("JSON decrypted token :");
-        this.logger.debug(jsonEncryptedPaymentData);
+        PaymentData paymentData = new PaymentData.Builder().fromJson(jsonPaymentData);
 
-        DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
-        this.logger.debug("OBJECT decrypted token :");
-        this.logger.debug(decryptedPaymentData.toString());
+        try {
+            // decrypt data
+            String token = paymentData.getPaymentMethodData().getTokenizationData().getToken();
+            String privateKey = paymentRequest.getPartnerConfiguration().getProperty(PRIVATE_KEY_PATH);
+            String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, paymentRequest.getEnvironment().isSandbox());
+            DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
+            DecryptedPaymentMethodDetails paymentDetails = decryptedPaymentData.getPaymentMethodDetails();
 
-        Card card = Card.CardBuilder.aCard()
-                //.withBrand()
-                //.withHolder()
-                .withExpirationDate(YearMonth.of(decryptedPaymentData.getPaymentMethodDetails().getExpirationYear(), decryptedPaymentData.getPaymentMethodDetails().getExpirationMonth()))
-                .withPan(decryptedPaymentData.getPaymentMethodDetails().getPan())
-                .build();
+            // create card from decrypted data
+            Card card = Card.CardBuilder.aCard()
+                    .withBrand(paymentData.getPaymentMethodData().getInfo().getCardNetwork())
+                    .withHolder(paymentData.getPaymentMethodData().getInfo().getBillingAddress().getName())
+                    .withExpirationDate(YearMonth.of(paymentDetails.getExpirationYear(), paymentDetails.getExpirationMonth()))
+                    .withPan(paymentDetails.getPan())
+                    .build();
 
-        PaymentModeCard paymentModeCard = PaymentModeCard.PaymentModeCardBuilder.aPaymentModeCard()
-                //.withFavoriteNetwork()
-                //.withPaymentDatas3DS()
-                //.withPaymentOption()
-                .withCard(card)
-                .build();
+            PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()
+                    .withCavv(paymentDetails.getCryptogram())
+                    .withEci(paymentDetails.getEciIndicator())
+                    .build();
 
-        return PaymentResponseDoPayment.PaymentResponseDoPaymentBuilder.aPaymentResponseDoPayment()
-                .withPartnerTransactionId("0123456789")
-                .withPaymentMode(paymentModeCard)
-                .build();
+            PaymentModeCard paymentModeCard = PaymentModeCard.PaymentModeCardBuilder.aPaymentModeCard()
+                    .withPaymentDatas3DS(paymentData3DS)
+                    .withCard(card)
+                    .build();
 
+            return PaymentResponseDoPayment.PaymentResponseDoPaymentBuilder
+                    .aPaymentResponseDoPayment()
+                    .withPartnerTransactionId(paymentRequest.getTransactionId())
+                    .withPaymentMode(paymentModeCard)
+                    .build();
+        } catch (GeneralSecurityException e) {
+            LOGGER.error("An error occured tring to decrypt data", e);
+            return PaymentResponseFailure.PaymentResponseFailureBuilder.aPaymentResponseFailure()
+                    .withPartnerTransactionId(paymentRequest.getTransactionId())
+                    .withFailureCause(FailureCause.INTERNAL_ERROR)
+                    .build();
+        }
+
+    }
+
+    public String getDecryptedData(String token, String privateKey, boolean isSandbox) throws GeneralSecurityException {
+        return GooglePayUtils.decryptFromGoogle(token, privateKey, isSandbox);
     }
 
 }
