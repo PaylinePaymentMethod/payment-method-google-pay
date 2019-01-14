@@ -2,7 +2,7 @@ package com.payline.payment.google.pay.bean;
 
 import org.json.JSONObject;
 
-import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_BILLING_ADRESS;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_BILLING_ADDRESS;
 import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_CARD_DETAILS;
 import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_CARD_NETWORK;
 
@@ -41,7 +41,7 @@ public class CardInfo {
 
             this.cardNetwork = getString(jo, BEAN_CARD_NETWORK);
             this.cardDetails = getString(jo, BEAN_CARD_DETAILS);
-            this.billingAddress = new BillingAddress.Builder().fromJson(getJSONObject(jo,BEAN_BILLING_ADRESS));
+            this.billingAddress = new BillingAddress.Builder().fromJson(getJSONObject(jo, BEAN_BILLING_ADDRESS));
 
             return new CardInfo(this);
         }

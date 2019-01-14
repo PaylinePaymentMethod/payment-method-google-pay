@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import java.security.GeneralSecurityException;
 import java.time.YearMonth;
 
+import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENTDATA_TOKENDATA;
 import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENT_REQUEST_PAYMENT_DATA_KEY;
 import static com.payline.payment.google.pay.utils.GooglePayConstants.PRIVATE_KEY_PATH;
 
@@ -28,8 +29,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
+        // check if the payment is in direct Mode
+        String jsonPaymentData;
+        if (paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENTDATA_TOKENDATA)!= null){
+            jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENTDATA_TOKENDATA);
+        }else{
+            jsonPaymentData = paymentRequest.getPartnerConfiguration().getProperty(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
+        }
 
-        String jsonPaymentData = paymentRequest.getPartnerConfiguration().getProperty(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
         PaymentData paymentData = new PaymentData.Builder().fromJson(jsonPaymentData);
 
         try {

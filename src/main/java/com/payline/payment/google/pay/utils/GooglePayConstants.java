@@ -14,13 +14,13 @@ public class GooglePayConstants {
     public static final String BEAN_NAME = "name";
     public static final String BEAN_CARD_NETWORK = "cardNetwork";
     public static final String BEAN_CARD_DETAILS = "cardDetails";
-    public static final String BEAN_BILLING_ADRESS = "billingAddress";
+    public static final String BEAN_BILLING_ADDRESS = "billingAddress";
     public static final String BEAN_MESSAGE_EXPIRATION = "messageExpiration";
-    public static final String BEAN_MESSAGE_ID ="messageId";
+    public static final String BEAN_MESSAGE_ID = "messageId";
     public static final String BEAN_PAYMENT_METHOD = "paymentMethod";
     public static final String BEAN_PAYMENT_METHOD_DETAILS = "paymentMethodDetails";
     public static final String BEAN_AUTH_METHOD = "authMethod";
-    public static final String BEAN_PAN ="pan";
+    public static final String BEAN_PAN = "pan";
     public static final String BEAN_EXPIRATION_MONTH = "expirationMonth";
     public static final String BEAN_EXPIRATION_YEAR = "expirationYear";
     public static final String BEAN_CRYPTOGRAM = "cryptogram";
@@ -30,7 +30,7 @@ public class GooglePayConstants {
     public static final String BEAN_EMAIL = "email";
     public static final String BEAN_PAYMENT_METHOD_DATA = "paymentMethodData";
     public static final String BEAN_TYPE = "type";
-    public static final String BEAN_DESCRIPTION ="description";
+    public static final String BEAN_DESCRIPTION = "description";
     public static final String BEAN_INFO = "info";
     public static final String BEAN_TOKENIZATION_DATA = "tokenizationData";
     public static final String BEAN_TOKEN = "token";
@@ -138,4 +138,6 @@ public class GooglePayConstants {
     public static final String NETWORK_DISCOVER_LABEL = "network.discover.label";
     public static final String NETWORK_DISCOVER_DESCRIPTION = "network.discover.description";
 
+    // Data used in PaymentService
+    public static final String PAYMENTDATA_TOKENDATA = "PAYMENTDATA_TOKENDATA ";
 }
