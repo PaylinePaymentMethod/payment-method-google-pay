@@ -36,6 +36,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         merchantName.setLabel(this.i18n.getMessage(MERCHANT_NAME_LABEL, locale));
         merchantName.setDescription(this.i18n.getMessage(MERCHANT_NAME_DESCRIPTION, locale));
         merchantName.setRequired(true);
+
         parameters.add(merchantName);
 
         final InputParameter merchantId = new InputParameter();
@@ -43,6 +44,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         merchantId.setLabel(this.i18n.getMessage(MERCHANT_ID_LABEL, locale));
         merchantId.setDescription(this.i18n.getMessage(MERCHANT_ID_DESCRIPTION, locale));
         merchantId.setRequired(true);
+
         parameters.add(merchantId);
 
         // parameters used to customize the googlePay pay button
@@ -67,6 +69,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         buttonType.setLabel(this.i18n.getMessage(BUTTON_SIZE_LABEL, locale));
         buttonType.setDescription(this.i18n.getMessage(BUTTON_SIZE_DESCRIPTION, locale));
         buttonType.setRequired(true);
+
         parameters.add(buttonType);
 
         // parameters used to choose payment networks
@@ -80,7 +83,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         allowedAuthMethod.setLabel(this.i18n.getMessage(ALLOWED_AUTH_METHOD_LABEL, locale));
         allowedAuthMethod.setDescription(this.i18n.getMessage(ALLOWED_AUTH_METHOD_DESCRIPTION, locale));
         allowedAuthMethod.setRequired(true);
-        parameters.add(allowedAuthMethod);
 
         Map<String, String> yesNoList = new HashMap<>();
         yesNoList.put(YES_KEY, this.i18n.getMessage(YES_VAL, locale));
@@ -132,10 +134,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         parameters.add(activateNetworkAmex);
 
         final NetworkListBoxParameter networkAmex = new NetworkListBoxParameter();
-        networkAmex.setKey(AvailableNetwork.AMEX.getKey());
-        networkAmex.setLabel(this.i18n.getMessage(NETWORK_AMEX_LABEL, locale));
-        networkAmex.setDescription(this.i18n.getMessage(NETWORK_AMEX_DESCRIPTION, locale));
-        networkAmex.setNetwork(AvailableNetwork.AMEX);
+        networkMastercard.setKey(AvailableNetwork.AMEX.getKey());
+        networkMastercard.setLabel(this.i18n.getMessage(NETWORK_AMEX_LABEL, locale));
+        networkMastercard.setDescription(this.i18n.getMessage(NETWORK_AMEX_DESCRIPTION, locale));
+        networkMastercard.setNetwork(AvailableNetwork.AMEX);
         parameters.add(networkAmex);
 
 /*        // not available yet

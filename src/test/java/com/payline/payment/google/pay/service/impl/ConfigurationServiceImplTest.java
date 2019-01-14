@@ -18,8 +18,6 @@ public class ConfigurationServiceImplTest {
     public void getParameters(){
         List<AbstractParameter> parameters = service.getParameters(Locale.FRANCE);
         Assert.assertTrue(!parameters.isEmpty());
-        Assert.assertEquals(parameters.size(), 12);
-//        Assert.assertEquals(parameters.size(), 16); // when JCP & Discover will be available
     }
 
     @Test

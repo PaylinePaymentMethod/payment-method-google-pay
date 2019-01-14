@@ -195,7 +195,7 @@ function prefetchGooglePaymentData() {
   // transactionInfo must be set but does not affect cache
   paymentDataRequest.transactionInfo = {
     totalPriceStatus: 'NOT_CURRENTLY_KNOWN',
-    currencyCode: '${currency}'
+    currencyCode: '${totalPrice}'
   };
   const paymentsClient = getGooglePaymentsClient();
   paymentsClient.prefetchPaymentData(paymentDataRequest);

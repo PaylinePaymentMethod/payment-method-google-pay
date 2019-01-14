@@ -13,10 +13,11 @@ import com.payline.pmapi.bean.paymentform.response.configuration.PaymentFormConf
 import com.payline.pmapi.bean.paymentform.response.configuration.impl.PaymentFormConfigurationResponseFailure;
 import com.payline.pmapi.bean.paymentform.response.configuration.impl.PaymentFormConfigurationResponseSpecific;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -122,10 +123,10 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
         final String buttonColor = properties.get(BUTTON_COLOR_KEY).getValue();
 
         // get the .js file
-        InputStream stream = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(JS_RES_INIT_PAYMENT);
-        String rawScriptInitPaymentContent = GooglePayUtils.ConvertInputStreamToString(stream);
+        File file = new File(this.getClass().getClassLoader().getResource(JS_RES_INIT_PAYMENT).getFile());
+        String rawScriptInitPaymentContent = new String(Files.readAllBytes(file.toPath()));
 
-        return rawScriptInitPaymentContent
+        String scriptInitPaymentContent = rawScriptInitPaymentContent
                 .replace(JS_PARAM_TAG_ALLOWED_CARD_NETWORKS, getAllowedCards(properties))
                 .replace(JS_PARAM_TAG_ALLOWED_AUTH_METHODS, getAllowedAuthMethod(properties))
                 .replace(JS_PARAM_TAG_TYPE, JS_PARAM_VALUE_TYPE)
@@ -143,6 +144,8 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
 
                 .replace(JS_PARAM_TAG_CONTAINER, JS_PARAM_VALUE_CONTAINER)
                 .replace(JS_PARAM_TAG_CALLBACK, JS_PARAM_VALUE_CALLBACK);
+
+        return scriptInitPaymentContent;
     }
 
     public String getAllowedCards(Map<String, ContractProperty> contractPropertyMap) {
