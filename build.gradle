@@ -14,8 +14,8 @@ apply plugin: 'java-library'
 apply plugin: 'jacoco'
 
 // Toggle comments to switch environment
-//apply from: "monext.gradle"
-apply from: "external.gradle"
+apply from: "monext.gradle"
+//apply from: "external.gradle"
 
 description = 'payment-method-google-pay'
 group 'com.payline.payment.google.pay'

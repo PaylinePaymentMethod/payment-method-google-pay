@@ -31,7 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
         // check if the payment is in direct Mode
         String jsonPaymentData;
-        if (paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENTDATA_TOKENDATA)!= null){
+        if (paymentRequest.getPaymentFormContext().getPaymentFormParameter().containsKey(PAYMENTDATA_TOKENDATA)){
             jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENTDATA_TOKENDATA);
         }else{
             jsonPaymentData = paymentRequest.getPartnerConfiguration().getProperty(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
