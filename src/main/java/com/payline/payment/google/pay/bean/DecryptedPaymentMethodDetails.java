@@ -66,7 +66,7 @@ public class DecryptedPaymentMethodDetails {
             this.expirationMonth = getInt(jo, BEAN_EXPIRATION_MONTH);
             this.expirationYear = getInt(jo, BEAN_EXPIRATION_YEAR);
             this.cryptogram = getString(jo, BEAN_CRYPTOGRAM);
-            this.eciIndicator = jo.getString(BEAN_ECI_INDICATOR);
+            this.eciIndicator = getString(jo, BEAN_ECI_INDICATOR);
 
             return new DecryptedPaymentMethodDetails(this);
         }

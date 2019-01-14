@@ -1,10 +1,12 @@
 package com.payline.payment.google.pay.service.impl;
 
 import com.payline.payment.google.pay.bean.DecryptedPaymentData;
+import com.payline.payment.google.pay.bean.DecryptedPaymentMethodDetails;
 import com.payline.payment.google.pay.bean.PaymentData;
 import com.payline.payment.google.pay.utils.GooglePayUtils;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
+import com.payline.pmapi.bean.payment.response.PaymentData3DS;
 import com.payline.pmapi.bean.payment.response.PaymentModeCard;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
 import com.payline.pmapi.bean.payment.response.buyerpaymentidentifier.Card;
@@ -36,19 +38,23 @@ public class PaymentServiceImpl implements PaymentService {
             String privateKey = paymentRequest.getPartnerConfiguration().getProperty(PRIVATE_KEY_PATH);
             String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, paymentRequest.getEnvironment().isSandbox());
             DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
+            DecryptedPaymentMethodDetails paymentDetails = decryptedPaymentData.getPaymentMethodDetails();
 
             // create card from decrypted data
             Card card = Card.CardBuilder.aCard()
                     .withBrand(paymentData.getPaymentMethodData().getInfo().getCardNetwork())
                     .withHolder(paymentData.getPaymentMethodData().getInfo().getBillingAddress().getName())
-                    .withExpirationDate(YearMonth.of(decryptedPaymentData.getPaymentMethodDetails().getExpirationYear(), decryptedPaymentData.getPaymentMethodDetails().getExpirationMonth()))
-                    .withPan(decryptedPaymentData.getPaymentMethodDetails().getPan())
+                    .withExpirationDate(YearMonth.of(paymentDetails.getExpirationYear(), paymentDetails.getExpirationMonth()))
+                    .withPan(paymentDetails.getPan())
+                    .build();
+
+            PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()
+                    .withCavv(paymentDetails.getCryptogram())
+                    .withEci(paymentDetails.getEciIndicator())
                     .build();
 
             PaymentModeCard paymentModeCard = PaymentModeCard.PaymentModeCardBuilder.aPaymentModeCard()
-//                    .withFavoriteNetwork()
-                    //.withPaymentDatas3DS()    // fixme quand google sera pret, bien set ce champ
-                    //.withPaymentOption()
+                    .withPaymentDatas3DS(paymentData3DS)
                     .withCard(card)
                     .build();
 
@@ -58,7 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .withPaymentMode(paymentModeCard)
                     .build();
         } catch (GeneralSecurityException e) {
-            LOGGER.error("An error occured tring to decrypt data: {}", e.getMessage(), e);
+            LOGGER.error("An error occured tring to decrypt data", e);
             return PaymentResponseFailure.PaymentResponseFailureBuilder.aPaymentResponseFailure()
                     .withPartnerTransactionId(paymentRequest.getTransactionId())
                     .withFailureCause(FailureCause.INTERNAL_ERROR)
