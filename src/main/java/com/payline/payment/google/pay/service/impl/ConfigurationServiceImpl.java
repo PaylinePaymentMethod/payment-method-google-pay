@@ -134,10 +134,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         parameters.add(activateNetworkAmex);
 
         final NetworkListBoxParameter networkAmex = new NetworkListBoxParameter();
-        networkMastercard.setKey(AvailableNetwork.AMEX.getKey());
-        networkMastercard.setLabel(this.i18n.getMessage(NETWORK_AMEX_LABEL, locale));
-        networkMastercard.setDescription(this.i18n.getMessage(NETWORK_AMEX_DESCRIPTION, locale));
-        networkMastercard.setNetwork(AvailableNetwork.AMEX);
+        networkAmex.setKey(AvailableNetwork.AMEX.getKey());
+        networkAmex.setLabel(this.i18n.getMessage(NETWORK_AMEX_LABEL, locale));
+        networkAmex.setDescription(this.i18n.getMessage(NETWORK_AMEX_DESCRIPTION, locale));
+        networkAmex.setNetwork(AvailableNetwork.AMEX);
         parameters.add(networkAmex);
 
 /*        // not available yet
