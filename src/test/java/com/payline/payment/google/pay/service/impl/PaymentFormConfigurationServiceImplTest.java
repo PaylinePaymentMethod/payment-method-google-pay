@@ -1,5 +1,6 @@
 package com.payline.payment.google.pay.service.impl;
 
+import com.payline.payment.google.pay.utils.GooglePayUtils;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.ContractProperty;
 import com.payline.pmapi.bean.paymentform.bean.PaymentFormLogo;
@@ -28,7 +29,7 @@ public class PaymentFormConfigurationServiceImplTest {
     private PaymentFormConfigurationServiceImpl service = new PaymentFormConfigurationServiceImpl();
 
     @Test
-    public void testGetPaymentFormConfiguration() {
+    public void testGetPaymentFormConfiguration() throws IOException {
         PaymentFormConfigurationResponse response = service.getPaymentFormConfiguration(createDefaultPaymentFormConfigurationRequest());
         Assert.assertTrue(response instanceof PaymentFormConfigurationResponseSpecific);
         PaymentFormConfigurationResponseSpecific responseSpecific = (PaymentFormConfigurationResponseSpecific) response;
@@ -51,6 +52,11 @@ public class PaymentFormConfigurationServiceImplTest {
         Assert.assertFalse(script.contains(JS_PARAM_TAG_BTN_COLOR));
         Assert.assertFalse(script.contains(JS_PARAM_TAG_CONTAINER));
         Assert.assertFalse(script.contains(JS_PARAM_TAG_CALLBACK));
+
+        InputStream stream = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("init.js");
+        String expectedJs = GooglePayUtils.ConvertInputStreamToString(stream);
+
+        Assert.assertEquals(expectedJs, script);
     }
 
     @Test

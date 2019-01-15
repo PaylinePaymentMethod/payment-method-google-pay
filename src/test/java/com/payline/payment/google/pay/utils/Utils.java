@@ -21,7 +21,7 @@ public class Utils {
     public static final String AUTH_URL = "http://authenticationurl.com/";
 
     public static final String MERCHANT_NAME_VAL = "monext";
-    public static final String MERCHANT_ID_VAL = "monext";
+    public static final String MERCHANT_ID_VAL = "gatewayMerchantId";
     public static final String TEST_PRIVATE_KEY = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgSaq46Z66YlV9Gp/B0WfRB7b4deHKeSE/kSDPI7+5Dw2hRANCAAQD5EWZSKBoQTlspL9hpHFfBvGUhSubJC/dF0uTPKTTwuo2fb+t/kUY2ZJJyuJWI4b9qqLBVxmye359mZAfQNCY";
 
     public static PaymentRequest.Builder createCompletePaymentBuilder() {
@@ -144,7 +144,7 @@ public class Utils {
         return PaymentFormConfigurationRequest.PaymentFormConfigurationRequestBuilder.aPaymentFormConfigurationRequest()
                 .withLocale(Locale.FRANCE)
                 .withBuyer(createDefaultBuyer())
-                .withAmount(new Amount(null, Currency.getInstance(EUR)))
+                .withAmount(new Amount(BigInteger.valueOf(100), Currency.getInstance(EUR)))
                 .withContractConfiguration(createContractConfiguration())
                 .withOrder(createOrder("007"))
                 .withEnvironment(createDefaultPaylineEnvironment())
