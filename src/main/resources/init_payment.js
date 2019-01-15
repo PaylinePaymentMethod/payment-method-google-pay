@@ -164,7 +164,7 @@ function addGooglePayButton() {
       paymentsClient.createButton(
       {
         buttonColor: "${buttonColor}",
-        buttonType: "${buttonType}"
+        buttonType: "${buttonType}",
         onClick: onGooglePaymentButtonClicked
       });
   document.getElementById('${container}').appendChild(button);
