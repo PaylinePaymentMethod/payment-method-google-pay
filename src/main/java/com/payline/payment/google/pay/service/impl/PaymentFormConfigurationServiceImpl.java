@@ -147,7 +147,6 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
 
     public String getAllowedCards(Map<String, ContractProperty> contractPropertyMap) {
         List<String> allowedCard = new ArrayList<>();
-        allowedCard.add("\"CB\"");
 
         // check every contract properties
         for (Map.Entry<String, ContractProperty> entry : contractPropertyMap.entrySet()) {

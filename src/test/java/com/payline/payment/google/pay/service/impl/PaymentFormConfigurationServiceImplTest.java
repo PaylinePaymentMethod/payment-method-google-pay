@@ -96,7 +96,7 @@ public class PaymentFormConfigurationServiceImplTest {
 
     @Test
     public void testGetAllowedCards() {
-        String expectedAllowedCard = "[\"CB\", \"MASTERCARD\", \"AMEX\", \"VISA\"]";
+        String expectedAllowedCard = "[\"MASTERCARD\", \"AMEX\", \"VISA\"]";
         ContractConfiguration configuration = createContractConfiguration();
         String allowedCard = service.getAllowedCards(configuration.getContractProperties());
         Assert.assertEquals(expectedAllowedCard, allowedCard);
