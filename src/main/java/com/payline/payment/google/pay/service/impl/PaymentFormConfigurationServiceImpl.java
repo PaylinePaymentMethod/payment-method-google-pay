@@ -67,12 +67,14 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
                     // La callback de retour Payline pour proceder a la payment request qui devra suivre
                     .withOnPay(partnerWidgetOnPayCallBack)
                     .withDescription(BUTTON_DESCRIPTION)
+                    .withDisplayButton(true).withButtonText("Ne pas cliquer") //TODO ligne temporaire le temps qu'un bug du widget soit corrige
                     .build();
 
             return PaymentFormConfigurationResponseSpecific
                     .PaymentFormConfigurationResponseSpecificBuilder
                     .aPaymentFormConfigurationResponseSpecific()
                     .withPaymentForm(partnerWidgetForm)
+
                     .build();
         } catch (IOException e) {
             LOGGER.error("An error occured when trying to load the js script", e);
