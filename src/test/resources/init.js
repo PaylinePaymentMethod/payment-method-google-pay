@@ -15,7 +15,7 @@ const baseRequest = {
  * @see {@link https://developers.google.com/pay/api/web/reference/object#CardParameters|CardParameters}
  * @todo confirm card networks supported by your site and gateway
  */
-const allowedCardNetworks = ["CB", "MASTERCARD", "AMEX", "VISA"];
+const allowedCardNetworks = ["MASTERCARD", "AMEX", "VISA"];
 
 /**
  * Card authentication methods supported by your site and your gateway
