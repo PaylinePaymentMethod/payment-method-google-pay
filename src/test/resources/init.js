@@ -164,7 +164,7 @@ function addGooglePayButton() {
       paymentsClient.createButton(
       {
         buttonColor: "DEFAULT",
-        buttonType: "LONG"
+        buttonType: "LONG",
         onClick: onGooglePaymentButtonClicked
       });
   document.getElementById('paylineGooglePayBtnDivContainer').appendChild(button);
