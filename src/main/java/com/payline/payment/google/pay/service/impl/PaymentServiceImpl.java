@@ -34,7 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (paymentRequest.getPaymentFormContext().getPaymentFormParameter().containsKey(PAYMENTDATA_TOKENDATA)){
             jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENTDATA_TOKENDATA);
         }else{
-            jsonPaymentData = paymentRequest.getPartnerConfiguration().getProperty(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
+            jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
         }
 
         PaymentData paymentData = new PaymentData.Builder().fromJson(jsonPaymentData);
