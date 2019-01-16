@@ -139,5 +139,5 @@ public class GooglePayConstants {
     public static final String NETWORK_DISCOVER_DESCRIPTION = "network.discover.description";
 
     // Data used in PaymentService
-    public static final String PAYMENTDATA_TOKENDATA = "PAYMENTDATA_TOKENDATA ";
+    public static final String PAYMENTDATA_TOKENDATA = "PAYMENTDATA_TOKENDATA";
 }
