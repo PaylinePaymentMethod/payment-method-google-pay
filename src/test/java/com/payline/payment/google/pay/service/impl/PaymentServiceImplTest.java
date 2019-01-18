@@ -34,8 +34,14 @@ public class PaymentServiceImplTest {
     private static final String PAN = "4111111111111111";
     private static final String BRAND_VISA = "VISA";
     private static final String NAME = "Jean JEAN";
+    private static final String DIRECT_MESSAGE = "{\n" +
+            "  \"signature\": \"MEQCIGnR6FL55NLTTy9d/cR1YAMaISPZIz7q4vHyZab6Gb4gAiBZlS4aH0t+sLhZmN+MLpQFjST8KiQqQz9rgUc5LUNJSQ==\",\n" +
+            "  \"protocolVersion\": \"ECv1\",\n" +
+            "  \"signedMessage\": \"{\\\"encryptedMessage\\\":\\\"fc0hvWDNnk8niyeJYitv+Sfd/gddhytNelx1fYrW50heG1TbRFHQT8I0hKzgHr+iG02bozXy1FDpuBj1iuz0wMU+XU26JfST8GL/dE7AbC1eRZ3RnCz/7GT3qzOZPhb4A75xNqddn4sesKpe/zApKeC4p18xNqvuVXWmo5HRI9rX1U5bn2KuqR2B12Ow9CMJvGp+9IZ5HF5+Xy9GJsfS7td4dPEp0Yw/d0CkHsg/6WilhgDXT5kAlMrwyq4k89SLJWpWCxwPDapi3s1UKmhfh51JEKTNxio/ilAj8r7bRnGx5zy9d4BUFwlaPqL1ZcpsZxYvH3K2Re+4wAQ\\\\u003d\\\",\\\"ephemeralPublicKey\\\":\\\"BJPHmxA2O1Gsm9JML5p+ucYdsxUcYwB2bXcc6vtQxG35smMjnNbsv2R0HyJ64cSohrAiuSFFptjQP9Ec4lBrYlQ\\\\u003d\\\",\\\"tag\\\":\\\"TkZk2HvX4SPYqI7PB2oC+cuXBfyYIzx6K31JQrS8Gjs\\\\u003d\\\"}\"\n" +
+            "}";
 
     @Test
+
     public void paymentRequest() throws GeneralSecurityException {
         PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPartnerConfiguration().getSensitiveProperties().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
@@ -58,7 +64,7 @@ public class PaymentServiceImplTest {
     @Test
     public void paymentRequestDirectMode() throws GeneralSecurityException {
         PaymentRequest request = Utils.createCompletePaymentBuilder().build();
-        request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENTDATA_TOKENDATA, GOOD_PAYMENT_DATA);
+        request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENTDATA_TOKENDATA, DIRECT_MESSAGE);
 
         doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
 
@@ -71,8 +77,6 @@ public class PaymentServiceImplTest {
         PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
 
         Assert.assertEquals(PAN, modeCard.getCard().getPan());
-        Assert.assertEquals(BRAND_VISA, modeCard.getCard().getBrand());
-        Assert.assertEquals(NAME, modeCard.getCard().getHolder());
     }
 
 

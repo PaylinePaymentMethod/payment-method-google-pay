@@ -19,9 +19,7 @@ import org.apache.logging.log4j.Logger;
 import java.security.GeneralSecurityException;
 import java.time.YearMonth;
 
-import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENTDATA_TOKENDATA;
-import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENT_REQUEST_PAYMENT_DATA_KEY;
-import static com.payline.payment.google.pay.utils.GooglePayConstants.PRIVATE_KEY_PATH;
+import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
 public class PaymentServiceImpl implements PaymentService {
 
@@ -29,19 +27,22 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
-        // check if the payment is in direct Mode
-        String jsonPaymentData;
-        if (paymentRequest.getPaymentFormContext().getPaymentFormParameter().containsKey(PAYMENTDATA_TOKENDATA)){
-            jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENTDATA_TOKENDATA);
-        }else{
-            jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
-        }
-
-        PaymentData paymentData = new PaymentData.Builder().fromJson(jsonPaymentData);
-
         try {
-            // decrypt data
-            String token = paymentData.getPaymentMethodData().getTokenizationData().getToken();
+            String token;
+            String brand = null;
+            String holder = null;
+            // check if the payment is in direct Mode
+            if (paymentRequest.getPaymentFormContext().getPaymentFormParameter().containsKey(PAYMENTDATA_TOKENDATA)){
+                token = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENTDATA_TOKENDATA);
+            }else{
+                String jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
+                PaymentData paymentData = new PaymentData.Builder().fromJson(jsonPaymentData);
+                token = paymentData.getPaymentMethodData().getTokenizationData().getToken();
+                brand = paymentData.getPaymentMethodData().getInfo().getCardNetwork();
+                holder = paymentData.getPaymentMethodData().getInfo().getBillingAddress().getName();
+            }
+
+            // decrypt token
             String privateKey = paymentRequest.getPartnerConfiguration().getProperty(PRIVATE_KEY_PATH);
             String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, paymentRequest.getEnvironment().isSandbox());
             DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
@@ -49,8 +50,8 @@ public class PaymentServiceImpl implements PaymentService {
 
             // create card from decrypted data
             Card card = Card.CardBuilder.aCard()
-                    .withBrand(paymentData.getPaymentMethodData().getInfo().getCardNetwork())
-                    .withHolder(paymentData.getPaymentMethodData().getInfo().getBillingAddress().getName())
+                    .withBrand(brand)
+                    .withHolder(holder)
                     .withExpirationDate(YearMonth.of(paymentDetails.getExpirationYear(), paymentDetails.getExpirationMonth()))
                     .withPan(paymentDetails.getPan())
                     .build();
