@@ -55,6 +55,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         buttonColor.setKey(BUTTON_COLOR_KEY);
         buttonColor.setLabel(this.i18n.getMessage(BUTTON_COLOR_LABEL, locale));
         buttonColor.setDescription(this.i18n.getMessage(BUTTON_COLOR_DESCRIPTION, locale));
+        buttonColor.setValue(colors.get(COLOR_WHITE_KEY));
         buttonColor.setRequired(true);
         parameters.add(buttonColor);
 
@@ -66,6 +67,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         buttonType.setKey(BUTTON_SIZE_KEY);
         buttonType.setLabel(this.i18n.getMessage(BUTTON_SIZE_LABEL, locale));
         buttonType.setDescription(this.i18n.getMessage(BUTTON_SIZE_DESCRIPTION, locale));
+        buttonType.setValue(types.get(SIZE_SHORT_KEY));
         buttonType.setRequired(true);
         parameters.add(buttonType);
 
@@ -79,6 +81,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         allowedAuthMethod.setKey(ALLOWED_AUTH_METHOD_KEY);
         allowedAuthMethod.setLabel(this.i18n.getMessage(ALLOWED_AUTH_METHOD_LABEL, locale));
         allowedAuthMethod.setDescription(this.i18n.getMessage(ALLOWED_AUTH_METHOD_DESCRIPTION, locale));
+        allowedAuthMethod.setValue(authMethod.get(METHOD_BOTH_KEY));
         allowedAuthMethod.setRequired(true);
         parameters.add(allowedAuthMethod);
 
@@ -98,6 +101,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         activateNetworkVisa.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_VISA_LABEL, locale));
         activateNetworkVisa.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_VISA_DESCRIPTION, locale));
         activateNetworkVisa.setList(yesNoList);
+        activateNetworkVisa.setValue(yesNoList.get(YES_KEY));
         activateNetworkVisa.setRequired(true);
         parameters.add(activateNetworkVisa);
 
@@ -113,6 +117,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         activateNetworkMastercard.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_MASTERCARD_LABEL, locale));
         activateNetworkMastercard.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_MASTERCARD_DESCRIPTION, locale));
         activateNetworkMastercard.setList(yesNoList);
+        activateNetworkMastercard.setValue(yesNoList.get(YES_KEY));
         activateNetworkMastercard.setRequired(true);
         parameters.add(activateNetworkMastercard);
 
@@ -128,6 +133,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         activateNetworkAmex.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_AMEX_LABEL, locale));
         activateNetworkAmex.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_AMEX_DESCRIPTION, locale));
         activateNetworkAmex.setList(yesNoList);
+        activateNetworkAmex.setValue(yesNoList.get(YES_KEY));
         activateNetworkAmex.setRequired(true);
         parameters.add(activateNetworkAmex);
 
@@ -144,6 +150,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         activateNetworkJCB.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_JCB_LABEL, locale));
         activateNetworkJCB.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_JCB_DESCRIPTION, locale));
         activateNetworkJCB.setList(yesNoList);
+        activateNetworkJCB.setValue(yesNoList.get(YES_KEY));
         activateNetworkJCB.setRequired(true);
         parameters.add(activateNetworkJCB);
 
@@ -159,6 +166,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         activateNetworkDiscover.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_DISCOVER_LABEL, locale));
         activateNetworkDiscover.sd(this.i18n.getMessage(ACTIVATE_NETWORK_DISCOVER_DESCRIPTION, locale));
         activateNetworkDiscover.setList(yesNoList);
+        activateNetworkDiscover.setValue(yesNoList.get(YES_KEY));
         activateNetworkDiscover.setRequired(true);
         parameters.add(activateNetworkDiscover);
 

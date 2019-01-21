@@ -27,13 +27,13 @@ public class PaymentMethodTokenizationData {
 
     //******************************************************************************************************************
     //***** BUILDER
-    public static final class Builder {
+    public static final class Builder extends JsonBean {
         private String type;
         private String token;
 
         public PaymentMethodTokenizationData fromJson(JSONObject jo) {
-            this.type = jo.getString(BEAN_TYPE);
-            this.token = jo.getString(BEAN_TOKEN);
+            this.type = getString(jo, BEAN_TYPE);
+            this.token = getString(jo, BEAN_TOKEN);
 
             return new PaymentMethodTokenizationData(this);
         }
