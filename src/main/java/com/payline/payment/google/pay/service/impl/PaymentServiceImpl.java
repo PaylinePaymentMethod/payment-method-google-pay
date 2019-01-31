@@ -75,7 +75,8 @@ public class PaymentServiceImpl implements PaymentService {
             LOGGER.error("An error occured tring to decrypt data", e);
             return PaymentResponseFailure.PaymentResponseFailureBuilder.aPaymentResponseFailure()
                     .withPartnerTransactionId(paymentRequest.getTransactionId())
-                    .withFailureCause(FailureCause.INTERNAL_ERROR)
+                    .withErrorCode("expired payload")
+                    .withFailureCause(FailureCause.SESSION_EXPIRED)
                     .build();
         }
 
