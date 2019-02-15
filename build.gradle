@@ -13,9 +13,12 @@ apply plugin: 'java-library'
 //apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'jacoco'
 
-// Toggle comments to switch environment
-apply from: "monext.gradle"
-//apply from: "external.gradle"
+def externalFileName = "$projectDir/.external"
+if (file(externalFileName).exists()) {
+    apply from: "external.gradle"
+} else {
+    apply from: "monext.gradle"
+}
 
 description = 'payment-method-google-pay'
 group 'com.payline.payment.google.pay'
@@ -61,6 +64,7 @@ dependencies {
         transitive = false
     }
 
+    testRuntimeOnly group: 'commons-lang', name: 'commons-lang', version: '2.6'
     testImplementation group: "junit", name: "junit", version: "4.12"
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.21.0'
     testImplementation "com.payline:payment-method-api:${paymentMethodApiVersion}"

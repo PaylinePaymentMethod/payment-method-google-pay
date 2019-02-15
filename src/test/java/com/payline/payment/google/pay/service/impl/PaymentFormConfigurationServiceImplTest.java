@@ -38,6 +38,13 @@ public class PaymentFormConfigurationServiceImplTest {
 
         // check good creation of script before import
         String script = widgetForm.getLoadingScriptBeforeImport();
+        Assert.assertFalse(script.contains(JS_PARAM_TAG_PAYMENTMETHOD_TYPE));
+        Assert.assertFalse(script.contains(JS_PARAM_TAG_EMAIL_REQUIRED));
+        Assert.assertFalse(script.contains(JS_PARAM_TAG_SHIPPING_ADDRESS_REQUIRED));
+        Assert.assertFalse(script.contains(JS_PARAM_TAG_BILLING_ADDRESS_REQUIRED));
+        Assert.assertFalse(script.contains(JS_PARAM_TAG_SHIPPING_PHONE));
+        Assert.assertFalse(script.contains(JS_PARAM_TAG_BILLING_ADDRESS_FORMAT));
+        Assert.assertFalse(script.contains(JS_PARAM_TAG_BILLING_PHONE));
         Assert.assertFalse(script.contains(JS_PARAM_TAG_ALLOWED_CARD_NETWORKS));
         Assert.assertFalse(script.contains(JS_PARAM_TAG_ALLOWED_AUTH_METHODS));
         Assert.assertFalse(script.contains(JS_PARAM_TAG_TYPE));
@@ -60,7 +67,7 @@ public class PaymentFormConfigurationServiceImplTest {
     }
 
     @Test
-    public void testGetPaymentFormLogo()throws IOException {
+    public void testGetPaymentFormLogo() throws IOException {
         // given: the logo image read from resources
         InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("google-pay-logo.png");
         BufferedImage image = ImageIO.read(input);
@@ -103,7 +110,7 @@ public class PaymentFormConfigurationServiceImplTest {
     }
 
     @Test
-    public void testGetAllowedAuthMethodAll(){
+    public void testGetAllowedAuthMethodAll() {
         String expectedAllowedCard = "[\"PAN_ONLY\", \"CRYPTOGRAM_3DS\"]";
         ContractConfiguration configuration = createContractConfiguration();
         String allowedAuthMethod = service.getAllowedAuthMethod(configuration.getContractProperties());
@@ -111,7 +118,7 @@ public class PaymentFormConfigurationServiceImplTest {
     }
 
     @Test
-    public void testGetAllowedAuthMethodPANONLY(){
+    public void testGetAllowedAuthMethodPANONLY() {
         String expectedAllowedCard = "[\"PAN_ONLY\"]";
         ContractConfiguration configuration = createContractConfiguration();
         configuration.getContractProperties().replace(ALLOWED_AUTH_METHOD_KEY, new ContractProperty(METHOD_PANONLY_KEY));
@@ -120,11 +127,30 @@ public class PaymentFormConfigurationServiceImplTest {
     }
 
     @Test
-    public void testGetAllowedAuthMethod3DS(){
+    public void testGetAllowedAuthMethod3DS() {
         String expectedAllowedCard = "[\"CRYPTOGRAM_3DS\"]";
         ContractConfiguration configuration = createContractConfiguration();
         configuration.getContractProperties().replace(ALLOWED_AUTH_METHOD_KEY, new ContractProperty(METHOD_3DS_KEY));
         String allowedAuthMethod = service.getAllowedAuthMethod(configuration.getContractProperties());
         Assert.assertEquals(expectedAllowedCard, allowedAuthMethod);
+    }
+
+    @Test
+    public void getAllowedCountry() {
+        String expected = "allowedCountryCodes: ['FR'],";
+        Assert.assertEquals(expected, service.getAllowedCountry("FR"));
+        Assert.assertEquals(expected, service.getAllowedCountry("fr"));
+        Assert.assertEquals("", service.getAllowedCountry(""));
+        Assert.assertEquals("", service.getAllowedCountry(null));
+    }
+
+    @Test
+    public void getBoolean() {
+        Assert.assertEquals("true", service.getBoolean("YES"));
+        Assert.assertEquals("true", service.getBoolean("yes"));
+        Assert.assertEquals("false", service.getBoolean(""));
+        Assert.assertEquals("false", service.getBoolean("NO"));
+        Assert.assertEquals("false", service.getBoolean("no"));
+        Assert.assertEquals("false", service.getBoolean(null));
     }
 }
