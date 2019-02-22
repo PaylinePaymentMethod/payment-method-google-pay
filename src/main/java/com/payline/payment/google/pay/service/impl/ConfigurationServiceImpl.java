@@ -1,5 +1,6 @@
 package com.payline.payment.google.pay.service.impl;
 
+import com.payline.payment.google.pay.utils.GooglePayUtils;
 import com.payline.payment.google.pay.utils.i18n.I18nService;
 import com.payline.pmapi.bean.configuration.AvailableNetwork;
 import com.payline.pmapi.bean.configuration.ReleaseInformation;
@@ -178,13 +179,89 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         parameters.add(networkDiscover);
         */
 
+        Map<String, String> paymentMethodList = new HashMap<>();
+        paymentMethodList.put(CARD_KEY, CARD_VAL);
+        final ListBoxParameter paymentMethodType = new ListBoxParameter();
+        paymentMethodType.setKey(PAYMENT_METHOD_TYPE_KEY);
+        paymentMethodType.setLabel(this.i18n.getMessage(PAYMENT_METHOD_TYPE_LABEL, locale));
+        paymentMethodType.setDescription(this.i18n.getMessage(PAYMENT_METHOD_TYPE_DESCRIPTION, locale));
+        paymentMethodType.setList(paymentMethodList);
+        paymentMethodType.setValue(paymentMethodList.get(CARD_KEY));
+        parameters.add(paymentMethodType);
+
+        final InputParameter allowedCountryCode = new InputParameter();
+        allowedCountryCode.setKey(ALLOWED_COUNTRY_KEY);
+        allowedCountryCode.setLabel(this.i18n.getMessage(ALLOWED_COUNTRY_LABEL, locale));
+        allowedCountryCode.setDescription(this.i18n.getMessage(ALLOWED_COUNTRY_DESCRIPTION, locale));;
+        parameters.add(allowedCountryCode);
+
+        final ListBoxParameter emailRequired = new ListBoxParameter();
+        emailRequired.setKey(EMAIL_REQUIRED_KEY);
+        emailRequired.setLabel(this.i18n.getMessage(EMAIL_REQUIRED_LABEL, locale));
+        emailRequired.setDescription(this.i18n.getMessage(EMAIL_REQUIRED_DESCRIPTION, locale));
+        emailRequired.setList(yesNoList);
+        emailRequired.setValue(yesNoList.get(YES_KEY));
+        parameters.add(emailRequired);
+
+        final ListBoxParameter shippingAddressRequired = new ListBoxParameter();
+        shippingAddressRequired.setKey(SHIPPING_ADDRESS_REQUIRED_KEY);
+        shippingAddressRequired.setLabel(this.i18n.getMessage(SHIPPING_ADDRESS_REQUIRED_LABEL, locale));
+        shippingAddressRequired.setDescription(this.i18n.getMessage(SHIPPING_ADDRESS_REQUIRED_DESCRIPTION, locale));
+        shippingAddressRequired.setList(yesNoList);
+        shippingAddressRequired.setValue(yesNoList.get(YES_KEY));
+        parameters.add(shippingAddressRequired);
+
+        final ListBoxParameter shippingPhoneNumberRequired = new ListBoxParameter();
+        shippingPhoneNumberRequired.setKey(SHIPPING_PHONE_REQUIRED_KEY);
+        shippingPhoneNumberRequired.setLabel(this.i18n.getMessage(SHIPPING_PHONE_REQUIRED_LABEL, locale));
+        shippingPhoneNumberRequired.setDescription(this.i18n.getMessage(SHIPPING_PHONE_REQUIRED_DESCRIPTION, locale));
+        shippingPhoneNumberRequired.setList(yesNoList);
+        shippingPhoneNumberRequired.setValue(yesNoList.get(YES_KEY));
+        parameters.add(shippingPhoneNumberRequired);
+
+        final ListBoxParameter billingAddressRequired = new ListBoxParameter();
+        billingAddressRequired.setKey(BILLING_ADDRESS_REQUIRED_KEY);
+        billingAddressRequired.setLabel(this.i18n.getMessage(BILLING_ADDRESS_REQUIRED_LABEL, locale));
+        billingAddressRequired.setDescription(this.i18n.getMessage(BILLING_ADDRESS_REQUIRED_DESCRIPTION, locale));
+        billingAddressRequired.setList(yesNoList);
+        billingAddressRequired.setValue(yesNoList.get(YES_KEY));
+        parameters.add(billingAddressRequired);
+
+        Map<String, String>minFullList = new HashMap<>();
+        minFullList.put(MIN, MIN);
+        minFullList.put(FULL, FULL);
+        final ListBoxParameter billingAddressFormat = new ListBoxParameter();
+        billingAddressFormat.setKey(BILLING_ADDRESS_FORMAT_KEY);
+        billingAddressFormat.setLabel(this.i18n.getMessage(BILLING_ADDRESS_FORMAT_LABEL, locale));
+        billingAddressFormat.setDescription(this.i18n.getMessage(BILLING_ADDRESS_FORMAT_DESCRIPTION, locale));
+        billingAddressFormat.setList(minFullList);
+        billingAddressFormat.setValue(minFullList.get(MIN));
+        parameters.add(billingAddressFormat);
+
+        final ListBoxParameter billingPhoneRequired = new ListBoxParameter();
+        billingPhoneRequired.setKey(BILLING_PHONE_REQUIRED_KEY);
+        billingPhoneRequired.setLabel(this.i18n.getMessage(BILLING_PHONE_REQUIRED_LABEL, locale));
+        billingPhoneRequired.setDescription(this.i18n.getMessage(BILLING_PHONE_REQUIRED_DESCRIPTION, locale));
+        billingPhoneRequired.setList(yesNoList);
+        billingPhoneRequired.setValue(yesNoList.get(YES_KEY));
+        parameters.add(billingPhoneRequired);
+
         return parameters;
     }
 
     @Override
     public Map<String, String> check(ContractParametersCheckRequest contractParametersCheckRequest) {
+        Map errors = new HashMap<>();
+        // check if allowedCountry is in ISO3166 range
+        String allowedCountry = contractParametersCheckRequest.getAccountInfo().get(ALLOWED_COUNTRY_KEY);
+        if (!GooglePayUtils.isEmpty(allowedCountry)){
+            if (!GooglePayUtils.isISO3166(allowedCountry)){
+                errors.put(ALLOWED_COUNTRY_KEY, i18n.getMessage(ERROR_NOT_ISO3166, contractParametersCheckRequest.getLocale()));
+            }
+        }
+
         // Google pay doesn't provide API to verify fields validity
-        return new HashMap<>();
+        return errors;
     }
 
     @Override
