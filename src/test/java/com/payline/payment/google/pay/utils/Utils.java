@@ -3,6 +3,7 @@ package com.payline.payment.google.pay.utils;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.configuration.PartnerConfiguration;
+import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.*;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormConfigurationRequest;
@@ -18,11 +19,41 @@ public class Utils {
     public static final String SUCCESS_URL = "https://succesurl.com/";
     public static final String FAILURE_URL = "http://cancelurl.com/";
     public static final String NOTIFICATION_URL = "http://notificationurl.com/";
-    public static final String AUTH_URL = "http://authenticationurl.com/";
 
     public static final String MERCHANT_NAME_VAL = "monext";
     public static final String MERCHANT_ID_VAL = "gatewayMerchantId";
     public static final String TEST_PRIVATE_KEY = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgSaq46Z66YlV9Gp/B0WfRB7b4deHKeSE/kSDPI7+5Dw2hRANCAAQD5EWZSKBoQTlspL9hpHFfBvGUhSubJC/dF0uTPKTTwuo2fb+t/kUY2ZJJyuJWI4b9qqLBVxmye359mZAfQNCY";
+
+    public static ContractParametersCheckRequest createContractParametersCheckRequest() {
+        Map<String, String> accountInfo = new HashMap<>();
+        accountInfo.put(PAYMENT_METHOD_TYPE_KEY, CARD_KEY);
+        accountInfo.put(EMAIL_REQUIRED_KEY, YES_KEY);
+        accountInfo.put(SHIPPING_ADDRESS_REQUIRED_KEY, YES_KEY);
+        accountInfo.put(ALLOWED_COUNTRY_KEY, "");
+        accountInfo.put(SHIPPING_PHONE_REQUIRED_KEY, YES_KEY);
+        accountInfo.put(BILLING_ADDRESS_REQUIRED_KEY, YES_KEY);
+        accountInfo.put(BILLING_ADDRESS_FORMAT_KEY, FULL);
+        accountInfo.put(BILLING_PHONE_REQUIRED_KEY, YES_KEY);
+        accountInfo.put(MERCHANT_NAME_KEY, MERCHANT_NAME_VAL);
+        accountInfo.put(MERCHANT_ID_KEY, MERCHANT_ID_VAL);
+        accountInfo.put(BUTTON_COLOR_KEY, COLOR_DEFAULT_KEY);
+        accountInfo.put(BUTTON_SIZE_KEY, SIZE_LONG_KEY);
+        accountInfo.put(ACTIVATE_NETWORK_VISA_KEY, YES_KEY);
+        accountInfo.put(ACTIVATE_NETWORK_MASTERCARD_KEY, YES_KEY);
+        accountInfo.put(ACTIVATE_NETWORK_AMEX_KEY, YES_KEY);
+        accountInfo.put(ALLOWED_AUTH_METHOD_KEY, METHOD_BOTH_KEY);
+
+        ContractConfiguration configuration = createContractConfiguration();
+
+        return ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
+                .withAccountInfo(accountInfo)
+                .withLocale(FRENCH)
+                .withContractConfiguration(configuration)
+                .withEnvironment(createDefaultPaylineEnvironment())
+//                .withPartnerConfiguration(partnerConfiguration)
+                .build();
+
+    }
 
     public static PaymentRequest.Builder createCompletePaymentBuilder() {
         final Amount amount = createAmount(EUR);
@@ -90,6 +121,15 @@ public class Utils {
 
     public static ContractConfiguration createContractConfiguration() {
         final ContractConfiguration contractConfiguration = new ContractConfiguration("", new HashMap<>());
+        contractConfiguration.getContractProperties().put(PAYMENT_METHOD_TYPE_KEY, new ContractProperty(CARD_KEY));
+        contractConfiguration.getContractProperties().put(EMAIL_REQUIRED_KEY, new ContractProperty(YES_KEY));
+        contractConfiguration.getContractProperties().put(SHIPPING_ADDRESS_REQUIRED_KEY, new ContractProperty(YES_KEY));
+        contractConfiguration.getContractProperties().put(ALLOWED_COUNTRY_KEY, new ContractProperty(""));
+        contractConfiguration.getContractProperties().put(SHIPPING_PHONE_REQUIRED_KEY, new ContractProperty(YES_KEY));
+        contractConfiguration.getContractProperties().put(BILLING_ADDRESS_REQUIRED_KEY, new ContractProperty(YES_KEY));
+        contractConfiguration.getContractProperties().put(BILLING_ADDRESS_FORMAT_KEY, new ContractProperty(FULL));
+        contractConfiguration.getContractProperties().put(BILLING_PHONE_REQUIRED_KEY, new ContractProperty(YES_KEY));
+
         contractConfiguration.getContractProperties().put(MERCHANT_NAME_KEY, new ContractProperty(MERCHANT_NAME_VAL));
         contractConfiguration.getContractProperties().put(MERCHANT_ID_KEY, new ContractProperty(MERCHANT_ID_VAL));
         contractConfiguration.getContractProperties().put(BUTTON_COLOR_KEY, new ContractProperty(COLOR_DEFAULT_KEY));
@@ -142,7 +182,7 @@ public class Utils {
 
     public static PaymentFormConfigurationRequest createDefaultPaymentFormConfigurationRequest() {
         return PaymentFormConfigurationRequest.PaymentFormConfigurationRequestBuilder.aPaymentFormConfigurationRequest()
-                .withLocale(Locale.FRANCE)
+                .withLocale(FRENCH)
                 .withBuyer(createDefaultBuyer())
                 .withAmount(new Amount(BigInteger.valueOf(100), Currency.getInstance(EUR)))
                 .withContractConfiguration(createContractConfiguration())

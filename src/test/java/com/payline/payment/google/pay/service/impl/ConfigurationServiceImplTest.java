@@ -1,7 +1,10 @@
 package com.payline.payment.google.pay.service.impl;
 
+import com.payline.payment.google.pay.utils.GooglePayConstants;
+import com.payline.payment.google.pay.utils.Utils;
 import com.payline.pmapi.bean.configuration.ReleaseInformation;
 import com.payline.pmapi.bean.configuration.parameter.AbstractParameter;
+import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -18,15 +21,24 @@ public class ConfigurationServiceImplTest {
     public void getParameters(){
         List<AbstractParameter> parameters = service.getParameters(Locale.FRANCE);
         Assert.assertTrue(!parameters.isEmpty());
-        Assert.assertEquals(parameters.size(), 12);
-//        Assert.assertEquals(parameters.size(), 16); // when JCP & Discover will be available
+        Assert.assertEquals(20, parameters.size());
     }
 
     @Test
     public void check(){
-        Map<String, String> errors = service.check(null);
+        ContractParametersCheckRequest request = Utils.createContractParametersCheckRequest();
+        Map<String, String> errors = service.check(request);
         Assert.assertNotNull(errors);
         Assert.assertEquals(0, errors.size());
+    }
+
+    @Test
+    public void checkBadCountryRestriction(){
+        ContractParametersCheckRequest request = Utils.createContractParametersCheckRequest();
+        request.getAccountInfo().replace(GooglePayConstants.ALLOWED_COUNTRY_KEY, "1A");
+        Map<String, String> errors = service.check(request);
+        Assert.assertNotNull(errors);
+        Assert.assertEquals(1, errors.size());
     }
 
 

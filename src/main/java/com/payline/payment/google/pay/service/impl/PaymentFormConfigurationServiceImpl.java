@@ -2,6 +2,7 @@ package com.payline.payment.google.pay.service.impl;
 
 import com.payline.payment.google.pay.service.ThalesPaymentFormConfigurationService;
 import com.payline.payment.google.pay.utils.GooglePayUtils;
+import com.payline.payment.google.pay.utils.InvalidDataException;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.ContractProperty;
 import com.payline.pmapi.bean.paymentform.bean.form.PartnerWidgetForm;
@@ -80,7 +81,15 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
             return PaymentFormConfigurationResponseFailure.PaymentFormConfigurationResponseFailureBuilder
                     .aPaymentFormConfigurationResponseFailure()
                     .withPartnerTransactionId(FAILURE_TRANSACTION_ID)
+                    .withErrorCode("Unable to read js file")
                     .withFailureCause(FailureCause.INTERNAL_ERROR)
+                    .build();
+        } catch (InvalidDataException e) {
+            return PaymentFormConfigurationResponseFailure.PaymentFormConfigurationResponseFailureBuilder
+                    .aPaymentFormConfigurationResponseFailure()
+                    .withPartnerTransactionId(FAILURE_TRANSACTION_ID)
+                    .withErrorCode(e.getMessage())
+                    .withFailureCause(e.getFailureCause())
                     .build();
         }
 
@@ -108,24 +117,51 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
     /**
      * @return
      */
-    private String getInitPaymentJavaScript(PaymentFormConfigurationRequest paymentFormConfigurationRequest) throws IOException {
+    private String getInitPaymentJavaScript(PaymentFormConfigurationRequest paymentFormConfigurationRequest) throws IOException, InvalidDataException {
 
         // get info to put in .js
+        if (paymentFormConfigurationRequest.getContractConfiguration() == null){
+            throw new InvalidDataException("ContractConfiguration object can't be null");
+        }
         final Map<String, ContractProperty> properties = paymentFormConfigurationRequest.getContractConfiguration().getContractProperties();
-        final String merchantId = properties.get(MERCHANT_ID_KEY).getValue();
-        final String merchantName = properties.get(MERCHANT_NAME_KEY).getValue();
+
+        final String paymentMethodType = getValueFromProperties(properties, PAYMENT_METHOD_TYPE_KEY);
+        final String emailRequired = getValueFromProperties(properties, EMAIL_REQUIRED_KEY);
+        final String shippingAddressRequired = getValueFromProperties(properties, SHIPPING_ADDRESS_REQUIRED_KEY);
+        final String allowedCountry = getValueFromProperties(properties, ALLOWED_COUNTRY_KEY);
+        final String shippingPhoneRequired = getValueFromProperties(properties, SHIPPING_PHONE_REQUIRED_KEY);
+        final String billingAddressRequired = getValueFromProperties(properties, BILLING_ADDRESS_REQUIRED_KEY);
+        final String billingAddressFormat = getValueFromProperties(properties, BILLING_ADDRESS_FORMAT_KEY);
+        final String billingPhoneRequired = getValueFromProperties(properties, BILLING_PHONE_REQUIRED_KEY);
+        final String merchantId = getValueFromProperties(properties, MERCHANT_ID_KEY);
+        final String merchantName = getValueFromProperties(properties, MERCHANT_NAME_KEY);
         final String environment = paymentFormConfigurationRequest.getEnvironment().isSandbox() ? TEST : PRODUCTION;
         final String currency = paymentFormConfigurationRequest.getAmount().getCurrency().getCurrencyCode();
         final String price = GooglePayUtils.createStringAmount(paymentFormConfigurationRequest.getAmount().getAmountInSmallestUnit());
         // the buttonType variable represents the size of the googlePay button
-        final String buttonType = properties.get(BUTTON_SIZE_KEY).getValue();
-        final String buttonColor = properties.get(BUTTON_COLOR_KEY).getValue();
+        final String buttonType = getValueFromProperties(properties, BUTTON_SIZE_KEY);
+        final String buttonColor = getValueFromProperties(properties, BUTTON_COLOR_KEY);
+        // verify fields
+        if (!GooglePayUtils.isEmpty(allowedCountry)) {
+            if (!GooglePayUtils.isISO3166(allowedCountry)) {
+                throw new InvalidDataException("allowed Country must be ISO3166 alpha2");
+            }
+        }
 
         // get the .js file
         InputStream stream = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(JS_RES_INIT_PAYMENT);
         String rawScriptInitPaymentContent = GooglePayUtils.ConvertInputStreamToString(stream);
 
         return rawScriptInitPaymentContent
+                .replace(JS_PARAM_TAG_PAYMENTMETHOD_TYPE, paymentMethodType)
+                .replace(JS_PARAM_TAG_EMAIL_REQUIRED, getBoolean(emailRequired))
+                .replace(JS_PARAM_TAG_SHIPPING_ADDRESS_REQUIRED, getBoolean(shippingAddressRequired))
+                .replace(JS_PARAM_TAG_ALLOWED_COUNTRYCODE, getAllowedCountry(allowedCountry))
+                .replace(JS_PARAM_TAG_SHIPPING_PHONE, getBoolean(shippingPhoneRequired))
+                .replace(JS_PARAM_TAG_BILLING_ADDRESS_REQUIRED, getBoolean(billingAddressRequired))
+                .replace(JS_PARAM_TAG_BILLING_ADDRESS_FORMAT, billingAddressFormat)
+                .replace(JS_PARAM_TAG_BILLING_PHONE, getBoolean(billingPhoneRequired))
+
                 .replace(JS_PARAM_TAG_ALLOWED_CARD_NETWORKS, getAllowedCards(properties))
                 .replace(JS_PARAM_TAG_ALLOWED_AUTH_METHODS, getAllowedAuthMethod(properties))
                 .replace(JS_PARAM_TAG_TYPE, JS_PARAM_VALUE_TYPE)
@@ -138,14 +174,24 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
                 .replace(JS_PARAM_TAG_CURRENCY, currency)
                 .replace(JS_PARAM_TAG_PRICE, price)
 
-                .replace(JS_PARAM_TAG_BTN_TYPE, buttonType)
-                .replace(JS_PARAM_TAG_BTN_COLOR, buttonColor)
+                .replace(JS_PARAM_TAG_BTN_TYPE, buttonType.toLowerCase())
+                .replace(JS_PARAM_TAG_BTN_COLOR, buttonColor.toLowerCase())
 
                 .replace(JS_PARAM_TAG_CONTAINER, JS_PARAM_VALUE_CONTAINER)
                 .replace(JS_PARAM_TAG_CALLBACK, JS_PARAM_VALUE_CALLBACK);
     }
 
-    public String getAllowedCards(Map<String, ContractProperty> contractPropertyMap) {
+    String getValueFromProperties(Map<String, ContractProperty> properties, String key) throws InvalidDataException {
+        if (properties == null) {
+            throw new InvalidDataException("property Map can't be null");
+        }
+        if (properties.get(key) == null || properties.get(key).getValue() == null) {
+            throw new InvalidDataException("property " + key + "must be present");
+        }
+        return properties.get(key).getValue();
+    }
+
+    String getAllowedCards(Map<String, ContractProperty> contractPropertyMap) {
         List<String> allowedCard = new ArrayList<>();
 
         // check every contract properties
@@ -162,7 +208,7 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
         return s;
     }
 
-    public String getAllowedAuthMethod(Map<String, ContractProperty> contractPropertyMap) {
+    String getAllowedAuthMethod(Map<String, ContractProperty> contractPropertyMap) {
         StringBuilder sb = new StringBuilder("[");
 
         String allowedAuthMethod = contractPropertyMap.get(ALLOWED_AUTH_METHOD_KEY).getValue();
@@ -188,4 +234,19 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
         return sb.toString();
     }
 
+    String getAllowedCountry(String country) {
+        if (GooglePayUtils.isEmpty(country)) {
+            return "";
+        } else {
+            return "allowedCountryCodes: ['" + country.toUpperCase() + "'],";
+        }
+    }
+
+    String getBoolean(String yesOrNo) {
+        if (YES_KEY.equalsIgnoreCase(yesOrNo)) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
 }

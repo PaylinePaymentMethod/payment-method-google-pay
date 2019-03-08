@@ -1,6 +1,6 @@
 package com.payline.payment.google.pay.utils.i18n;
 
-import org.apache.logging.log4j.LogManager;
+import com.payline.pmapi.logger.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Locale;

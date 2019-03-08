@@ -36,6 +36,14 @@ public class GooglePayConstants {
     public static final String BEAN_TOKEN = "token";
 
     // data used is js file
+    public static final String JS_PARAM_TAG_PAYMENTMETHOD_TYPE = "${paymentMethodType}";
+    public static final String JS_PARAM_TAG_EMAIL_REQUIRED = "${emailRequired}";
+    public static final String JS_PARAM_TAG_SHIPPING_ADDRESS_REQUIRED = "${shippingAddressRequired}";
+    public static final String JS_PARAM_TAG_ALLOWED_COUNTRYCODE = "${allowedCountryCode}";
+    public static final String JS_PARAM_TAG_SHIPPING_PHONE = "${shippingPhoneNumberRequired}";
+    public static final String JS_PARAM_TAG_BILLING_ADDRESS_REQUIRED = "${billingAddressRequired}";
+    public static final String JS_PARAM_TAG_BILLING_ADDRESS_FORMAT = "${billingAddressFormat}";
+    public static final String JS_PARAM_TAG_BILLING_PHONE = "${billingPhoneNumberRequired}";
     public static final String JS_PARAM_TAG_ALLOWED_CARD_NETWORKS = "${allowedCardNetworks}";
     public static final String JS_PARAM_TAG_ALLOWED_AUTH_METHODS = "${allowedCardAuthMethods}";
     public static final String JS_PARAM_TAG_TYPE = "${type}";
@@ -100,6 +108,8 @@ public class GooglePayConstants {
     public static final String NO_KEY = "NO";
     public static final String YES_VAL = "activate.yes";
     public static final String NO_VAL = "activate.no";
+    public static final String MIN = "MIN";
+    public static final String FULL = "FULL";
     public static final String METHOD_PANONLY_KEY = "METHOD_PANONLY";
     public static final String METHOD_3DS_KEY = "METHOD_3DS";
     public static final String METHOD_BOTH_KEY = "METHOD_BOTH";
@@ -137,6 +147,35 @@ public class GooglePayConstants {
     public static final String NETWORK_JCB_DESCRIPTION = "network.jcb.description";
     public static final String NETWORK_DISCOVER_LABEL = "network.discover.label";
     public static final String NETWORK_DISCOVER_DESCRIPTION = "network.discover.description";
+
+    public static final String CARD_KEY = "CARD";
+    public static final String CARD_VAL = "CARD";
+    public static final String PAYMENT_METHOD_TYPE_KEY = "paymentMethodType";
+    public static final String PAYMENT_METHOD_TYPE_LABEL = "paymentMethod.type.label";
+    public static final String PAYMENT_METHOD_TYPE_DESCRIPTION = "paymentMethod.type.description";
+    public static final String EMAIL_REQUIRED_KEY = "emailRequired";
+    public static final String EMAIL_REQUIRED_LABEL = "email.required.label";
+    public static final String EMAIL_REQUIRED_DESCRIPTION = "email.required.description";
+    public static final String SHIPPING_ADDRESS_REQUIRED_KEY = "shippingAddressRequired";
+    public static final String SHIPPING_ADDRESS_REQUIRED_LABEL = "shippingAddressRequired.label";
+    public static final String SHIPPING_ADDRESS_REQUIRED_DESCRIPTION = "shippingAddressRequired.description";
+    public static final String ALLOWED_COUNTRY_KEY = "allowedCountry";
+    public static final String ALLOWED_COUNTRY_LABEL = "allowedCountry.label";
+    public static final String ALLOWED_COUNTRY_DESCRIPTION = "allowedCountry.description";
+    public static final String SHIPPING_PHONE_REQUIRED_KEY = "shippingPhoneRequired";
+    public static final String SHIPPING_PHONE_REQUIRED_LABEL = "shippingPhoneRequired.label";
+    public static final String SHIPPING_PHONE_REQUIRED_DESCRIPTION = "shippingPhoneRequired.description";
+    public static final String BILLING_ADDRESS_REQUIRED_KEY = "billingAddressRequired";
+    public static final String BILLING_ADDRESS_REQUIRED_LABEL = "billingAddressRequired.label";
+    public static final String BILLING_ADDRESS_REQUIRED_DESCRIPTION = "billingAddressRequired.description";
+    public static final String BILLING_ADDRESS_FORMAT_KEY = "billingAddressFormat";
+    public static final String BILLING_ADDRESS_FORMAT_LABEL = "billingAddressFormat.label";
+    public static final String BILLING_ADDRESS_FORMAT_DESCRIPTION = "billingAddressFormat.description";
+    public static final String BILLING_PHONE_REQUIRED_KEY = "billingPhoneRequired";
+    public static final String BILLING_PHONE_REQUIRED_LABEL = "billingPhoneRequired.label";
+    public static final String BILLING_PHONE_REQUIRED_DESCRIPTION = "billingPhoneRequired.description";
+
+    public static final String ERROR_NOT_ISO3166 = "contract.errors.countryNotISO";
 
     // Data used in PaymentService
     public static final String PAYMENTDATA_TOKENDATA = "PAYMENTDATA_TOKENDATA";
