@@ -40,6 +40,9 @@ public class PaymentServiceImpl implements PaymentService {
                 token = paymentData.getPaymentMethodData().getTokenizationData().getToken();
                 brand = paymentData.getPaymentMethodData().getInfo().getCardNetwork();
                 holder = paymentData.getPaymentMethodData().getInfo().getBillingAddress().getName();
+                if(holder == null){
+                    holder = "";
+                }
             }
 
             // decrypt token
