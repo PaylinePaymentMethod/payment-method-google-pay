@@ -75,7 +75,7 @@ public class GooglePayConstants {
     public static final String JS_START_METHOD_NAME = "onGooglePayLoaded()";
     public static final String ACTIVATE_NETWORK_REGEX = "activateNetwork";
     public static final String PAYMENT_REQUEST_PAYMENT_DATA_KEY = "data";
-    public static final String BUTTON_DESCRIPTION = "";
+    public static final String BUTTON_DESCRIPTION = "payment.form.config.description";
     public static final String FAILURE_TRANSACTION_ID = "NO TRANSACTION YET";
 
     // data used in ConfigurationService
