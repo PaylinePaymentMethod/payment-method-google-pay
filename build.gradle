@@ -22,7 +22,7 @@ if (file(externalFileName).exists()) {
 
 description = 'payment-method-google-pay'
 group 'com.payline.payment.google.pay'
-version '1.1-SNAPSHOT'
+version '1.1'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -30,8 +30,8 @@ targetCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
 ext {
-    paymentMethodApiVersion = '1.2-SNAPSHOT'
-    paymentMethodIntegrationVersion = '1.2-SNAPSHOT'
+    paymentMethodApiVersion = '1.2'
+    paymentMethodIntegrationVersion = '1.2'
     mockitoVersion = '2.19.0'
     releaseDirectoryPath = 'D:/build'
 }
