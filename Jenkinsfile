@@ -55,8 +55,8 @@ pipeline {
         }
         stage("Dependency Check") {
             steps {
-                sh './gradlew dependencyCheckAnalyze --info'
-                dependencyCheckPublisher canComputeNew: false, defaultEncoding: '', healthy: '', pattern: '**/build/reports/dependency-check-report.xml', unHealthy: ''
+                sh './gradlew dependencyCheckAggregate --info'
+                dependencyCheckPublisher pattern: '**/build/reports/dependency-check-report.xml'
             }
          }
         stage ('Publication & Sonar') {
