@@ -24,6 +24,7 @@ public class GooglePayUtils {
                 .fetchSenderVerifyingKeysWith(keysManager)
                 .recipientId("gateway:" + JS_PARAM_VALUE_GATEWAY_NAME)
                 // Multiple private keys can be added to support graceful key rotations.
+                .protocolVersion("ECv2")
                 .addRecipientPrivateKey(privateKey)
                 .build()
                 .unseal(encryptedMessage);

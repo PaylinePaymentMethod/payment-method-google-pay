@@ -54,11 +54,12 @@ pipeline {
             }
         }
         stage("Dependency Check") {
+            when { branch 'develop' }
             steps {
                 sh './gradlew dependencyCheckAggregate --info'
                 dependencyCheckPublisher pattern: '**/build/reports/dependency-check-report.xml'
             }
-         }
+        }
         stage ('Publication & Sonar') {
             parallel {
                 stage('Publication sur Nexus') {
@@ -66,7 +67,7 @@ pipeline {
                         anyOf { branch 'master'; branch 'develop'; branch "release/*" }
                     }
                     steps {
-                        gitlabCommitStatus(name: "Publication sur Nexus") {
+                        gitlabCommitStatus(name: 'Publication sur Nexus') {
                             sh './gradlew publish'
                         }
                     }
@@ -86,7 +87,7 @@ pipeline {
                         withSonarQubeEnv('SonarMonext') {
                             script {
                                 if (BRANCH_NAME == 'develop') {
-                                   sh './gradlew sonarqube -Dsonar.branch.name=${BRANCH_NAME}  --info --stacktrace'
+                                    sh './gradlew sonarqube -Dsonar.branch.name=${BRANCH_NAME} --info --stacktrace'
                                 }
                                 if (BRANCH_NAME != 'develop') {
                                     sh './gradlew sonarqube  -Dsonar.branch.name=${BRANCH_NAME} -Dsonar.branch.target=develop --info --stacktrace'
@@ -102,15 +103,14 @@ pipeline {
                 }
             }
         }
-       // Not possible from our jenkins
-       // stage ('Tag Git') {
-       //     when {
-       //         anyOf { branch 'master'; branch 'develop'; branch "release/*" }
-       //     }
-       //     steps {
-       //         sh "git tag -f V${versionInGradle}"
-       //         sh "git push origin -f V${versionInGradle}"
-       //     }
-       // }
+        stage ('Tag Git') {
+            when {
+                anyOf { branch 'master'; branch 'develop'; branch "release/*" }
+            }
+            steps {
+                sh "git tag -f V${versionInGradle}"
+                sh "git push origin -f V${versionInGradle}"
+            }
+        }
     }
 }

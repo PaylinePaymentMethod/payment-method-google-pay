@@ -24,6 +24,8 @@ import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 public class PaymentServiceImpl implements PaymentService {
 
     private static final Logger LOGGER = LogManager.getLogger(PaymentServiceImpl.class);
+    /** Indique que le numero de carte transité par google pay est un PAN et non un TOKEN PAN */
+    private static final String METHOD_PAN_ONLY = "PAN_ONLY";
 
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
@@ -57,6 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .withHolder(holder)
                     .withExpirationDate(YearMonth.of(paymentDetails.getExpirationYear(), paymentDetails.getExpirationMonth()))
                     .withPan(paymentDetails.getPan())
+                    .withPanType(METHOD_PAN_ONLY.equals(paymentDetails.getAuthMethod()) ? Card.PanType.CARD_PAN : Card.PanType.TOKEN_PAN)
                     .build();
 
             PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()

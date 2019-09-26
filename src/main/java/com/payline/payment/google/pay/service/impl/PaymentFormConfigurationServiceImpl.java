@@ -3,6 +3,7 @@ package com.payline.payment.google.pay.service.impl;
 import com.payline.payment.google.pay.service.ThalesPaymentFormConfigurationService;
 import com.payline.payment.google.pay.utils.GooglePayUtils;
 import com.payline.payment.google.pay.utils.InvalidDataException;
+import com.payline.payment.google.pay.utils.i18n.I18nService;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.ContractProperty;
 import com.payline.pmapi.bean.paymentform.bean.form.PartnerWidgetForm;
@@ -67,7 +68,7 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
                     .withContainer(partnerWidgetContainerTargetDivId)
                     // La callback de retour Payline pour proceder a la payment request qui devra suivre
                     .withOnPay(partnerWidgetOnPayCallBack)
-                    .withDescription(BUTTON_DESCRIPTION)
+                    .withDescription(I18nService.getInstance().getMessage(BUTTON_DESCRIPTION, paymentFormConfigurationRequest.getLocale()))
                     .build();
 
             return PaymentFormConfigurationResponseSpecific
