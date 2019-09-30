@@ -30,7 +30,7 @@ targetCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
 ext {
-    paymentMethodApiVersion = '1.5-CBR-SNAPSHOT'
+    paymentMethodApiVersion = '1.5-SNAPSHOT'
     paymentMethodIntegrationVersion = '1.2'
     mockitoVersion = '2.19.0'
     releaseDirectoryPath = 'D:/build'
