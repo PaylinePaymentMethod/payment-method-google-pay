@@ -1,5 +1,6 @@
 package com.payline.payment.google.pay.service.impl;
 
+import com.google.api.client.util.Base64;
 import com.payline.payment.google.pay.bean.DecryptedPaymentData;
 import com.payline.payment.google.pay.bean.DecryptedPaymentMethodDetails;
 import com.payline.payment.google.pay.bean.PaymentData;
@@ -18,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.security.GeneralSecurityException;
 import java.time.YearMonth;
+import java.util.Optional;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
@@ -62,8 +64,9 @@ public class PaymentServiceImpl implements PaymentService {
                     .withPanType(METHOD_PAN_ONLY.equals(paymentDetails.getAuthMethod()) ? Card.PanType.CARD_PAN : Card.PanType.TOKEN_PAN)
                     .build();
 
+            final String cryptogram = paymentDetails.getCryptogram();
             PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()
-                    .withCavv(paymentDetails.getCryptogram())
+                    .withCavv(Optional.ofNullable(cryptogram).map(c -> new String(Base64.decodeBase64(c))).orElse(null))
                     .withEci(paymentDetails.getEciIndicator())
                     .build();
 
