@@ -64,9 +64,8 @@ public class PaymentServiceImpl implements PaymentService {
                     .withPanType(METHOD_PAN_ONLY.equals(paymentDetails.getAuthMethod()) ? Card.PanType.CARD_PAN : Card.PanType.TOKEN_PAN)
                     .build();
 
-            final String cryptogram = paymentDetails.getCryptogram();
             PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()
-                    .withCavv(Optional.ofNullable(cryptogram).map(c -> new String(Base64.decodeBase64(c))).orElse(null))
+                    .withCavv(paymentDetails.getCryptogram())
                     .withEci(paymentDetails.getEciIndicator())
                     .build();
 
