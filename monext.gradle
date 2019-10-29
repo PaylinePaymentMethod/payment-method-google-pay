@@ -54,7 +54,7 @@ sonarqube {
 buildscript {
     repositories {
         maven {
-            url "https://nexus.intra.monext.fr:10130/nexus/content/groups/public"
+            url nexusGroupsUrl
             credentials {
                 username mavenUser
                 password mavenPassword
