@@ -64,9 +64,15 @@ public class PaymentServiceImpl implements PaymentService {
                     .withPanType(METHOD_PAN_ONLY.equals(paymentDetails.getAuthMethod()) ? Card.PanType.CARD_PAN : Card.PanType.TOKEN_PAN)
                     .build();
 
+            // set the right value to the ECI (see PAYLAPMEXT242)
+            String eci = paymentDetails.getEciIndicator();
+            if (GooglePayUtils.isEmpty(eci) || "5".equalsIgnoreCase(eci)){
+                eci = "02";
+            }
+
             PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()
                     .withCavv(paymentDetails.getCryptogram())
-                    .withEci(paymentDetails.getEciIndicator())
+                    .withEci(eci)
                     .build();
 
             PaymentModeCard paymentModeCard = PaymentModeCard.PaymentModeCardBuilder.aPaymentModeCard()
