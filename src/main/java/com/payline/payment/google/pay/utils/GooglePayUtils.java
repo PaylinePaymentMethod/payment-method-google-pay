@@ -16,11 +16,11 @@ import static com.payline.payment.google.pay.utils.GooglePayConstants.JS_PARAM_V
 
 public class GooglePayUtils {
 
-    public static String decryptFromGoogle(String encryptedMessage, String privateKey, boolean isSandbox) throws GeneralSecurityException {
+    public static String decryptFromGoogle(String encryptedMessage, String privateKey, String privateKeyOld, boolean isSandbox) throws GeneralSecurityException {
         GooglePaymentsPublicKeysManager keysManager = isSandbox ? GooglePaymentsPublicKeysManager.INSTANCE_TEST : GooglePaymentsPublicKeysManager.INSTANCE_PRODUCTION;
         keysManager.refreshInBackground();
 
-        return new PaymentMethodTokenRecipient.Builder()
+        PaymentMethodTokenRecipient.Builder builder = new PaymentMethodTokenRecipient.Builder()
                 .fetchSenderVerifyingKeysWith(keysManager)
                 .recipientId("gateway:" + JS_PARAM_VALUE_GATEWAY_NAME)
                 // Multiple private keys can be added to support graceful key rotations.

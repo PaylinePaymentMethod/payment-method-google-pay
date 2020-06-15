@@ -51,7 +51,8 @@ public class PaymentServiceImpl implements PaymentService {
 
             // decrypt token
             String privateKey = paymentRequest.getPartnerConfiguration().getProperty(PRIVATE_KEY_PATH);
-            String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, paymentRequest.getEnvironment().isSandbox());
+            String privateKeyOld = paymentRequest.getPartnerConfiguration().getProperty(OLD_PRIVATE_KEY_PATH);
+            String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, privateKeyOld, paymentRequest.getEnvironment().isSandbox());
             DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
             DecryptedPaymentMethodDetails paymentDetails = decryptedPaymentData.getPaymentMethodDetails();
 
@@ -96,8 +97,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
-    public String getDecryptedData(String token, String privateKey, boolean isSandbox) throws GeneralSecurityException {
-        return GooglePayUtils.decryptFromGoogle(token, privateKey, isSandbox);
+    public String getDecryptedData(String token, String privateKey, String privateKeyOld, boolean isSandbox) throws GeneralSecurityException {
+        return GooglePayUtils.decryptFromGoogle(token, privateKey, privateKeyOld, isSandbox);
     }
 
 }
