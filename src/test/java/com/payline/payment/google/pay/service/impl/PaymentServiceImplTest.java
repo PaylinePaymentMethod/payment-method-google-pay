@@ -17,8 +17,7 @@ import java.security.GeneralSecurityException;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENTDATA_TOKENDATA;
 import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENT_REQUEST_PAYMENT_DATA_KEY;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
@@ -48,7 +47,7 @@ public class PaymentServiceImplTest {
         PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
 
-        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
+        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
 
         PaymentResponse response = service.paymentRequest(request);
 
@@ -91,7 +90,7 @@ public class PaymentServiceImplTest {
         PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENTDATA_TOKENDATA, DIRECT_MESSAGE);
 
-        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
+        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
 
         PaymentResponse response = service.paymentRequest(request);
 
@@ -111,7 +110,7 @@ public class PaymentServiceImplTest {
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
 
 
-        doThrow(new GeneralSecurityException()).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
+        doThrow(new GeneralSecurityException()).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
         PaymentResponse response = service.paymentRequest(request);
 
         Assert.assertNotNull(response);
@@ -123,7 +122,7 @@ public class PaymentServiceImplTest {
         PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, LIGHT_PAYMENT_DATA);
 
-        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
+        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
 
         PaymentResponse response = service.paymentRequest(request);
 
