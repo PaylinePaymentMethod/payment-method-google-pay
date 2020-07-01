@@ -68,7 +68,7 @@ public class PaymentServiceImplTest {
         PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
 
-        doReturn(GOOD_RESPONSE_DATA_WITH_ECI).when(service).getDecryptedData(anyString(), anyString(), anyBoolean());
+        doReturn(GOOD_RESPONSE_DATA_WITH_ECI).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
 
         PaymentResponse response = service.paymentRequest(request);
 
