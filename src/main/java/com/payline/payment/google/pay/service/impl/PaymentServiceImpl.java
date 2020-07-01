@@ -1,6 +1,5 @@
 package com.payline.payment.google.pay.service.impl;
 
-import com.google.api.client.util.Base64;
 import com.payline.payment.google.pay.bean.DecryptedPaymentData;
 import com.payline.payment.google.pay.bean.DecryptedPaymentMethodDetails;
 import com.payline.payment.google.pay.bean.PaymentData;
@@ -13,13 +12,12 @@ import com.payline.pmapi.bean.payment.response.PaymentResponse;
 import com.payline.pmapi.bean.payment.response.buyerpaymentidentifier.Card;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseDoPayment;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseFailure;
-import com.payline.pmapi.service.PaymentService;
 import com.payline.pmapi.logger.LogManager;
+import com.payline.pmapi.service.PaymentService;
 import org.apache.logging.log4j.Logger;
 
 import java.security.GeneralSecurityException;
 import java.time.YearMonth;
-import java.util.Optional;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
@@ -51,7 +49,8 @@ public class PaymentServiceImpl implements PaymentService {
 
             // decrypt token
             String privateKey = paymentRequest.getPartnerConfiguration().getProperty(PRIVATE_KEY_PATH);
-            String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, paymentRequest.getEnvironment().isSandbox());
+            String privateKeyOld = paymentRequest.getPartnerConfiguration().getProperty(OLD_PRIVATE_KEY_PATH);
+            String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, privateKeyOld, paymentRequest.getEnvironment().isSandbox());
             DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
             DecryptedPaymentMethodDetails paymentDetails = decryptedPaymentData.getPaymentMethodDetails();
 
@@ -64,9 +63,15 @@ public class PaymentServiceImpl implements PaymentService {
                     .withPanType(METHOD_PAN_ONLY.equals(paymentDetails.getAuthMethod()) ? Card.PanType.CARD_PAN : Card.PanType.TOKEN_PAN)
                     .build();
 
+            // set the right value to the ECI (see PAYLAPMEXT242)
+            String eci = paymentDetails.getEciIndicator();
+            if (GooglePayUtils.isEmpty(eci) || "5".equalsIgnoreCase(eci)){
+                eci = "02";
+            }
+
             PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()
                     .withCavv(paymentDetails.getCryptogram())
-                    .withEci(paymentDetails.getEciIndicator())
+                    .withEci(eci)
                     .build();
 
             PaymentModeCard paymentModeCard = PaymentModeCard.PaymentModeCardBuilder.aPaymentModeCard()
@@ -90,8 +95,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
-    public String getDecryptedData(String token, String privateKey, boolean isSandbox) throws GeneralSecurityException {
-        return GooglePayUtils.decryptFromGoogle(token, privateKey, isSandbox);
+    public String getDecryptedData(String token, String privateKey, String privateKeyOld, boolean isSandbox) throws GeneralSecurityException {
+        return GooglePayUtils.decryptFromGoogle(token, privateKey, privateKeyOld, isSandbox);
     }
 
 }

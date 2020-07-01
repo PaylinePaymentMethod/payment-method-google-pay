@@ -2,6 +2,7 @@ package com.payline.payment.google.pay.utils;
 
 public class GooglePayConstants {
     public static final String PRIVATE_KEY_PATH = "partner.google.pay.access.private.key";
+    public static final String OLD_PRIVATE_KEY_PATH = "partner.google.pay.access.private.key.old";
 
     public static final String RESOURCE_BUNDLE_BASE_NAME = "messages";
 
