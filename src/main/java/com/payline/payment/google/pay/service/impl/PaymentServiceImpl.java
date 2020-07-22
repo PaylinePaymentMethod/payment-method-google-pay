@@ -19,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 import java.security.GeneralSecurityException;
 import java.time.YearMonth;
 
+import static com.payline.payment.google.pay.bean.CardInfo.MASTERCARD;
+import static com.payline.payment.google.pay.bean.CardInfo.VISA;
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 
 public class PaymentServiceImpl implements PaymentService {
@@ -63,9 +65,12 @@ public class PaymentServiceImpl implements PaymentService {
                     .withPanType(METHOD_PAN_ONLY.equals(paymentDetails.getAuthMethod()) ? Card.PanType.CARD_PAN : Card.PanType.TOKEN_PAN)
                     .build();
 
-            // set the right value to the ECI (see PAYLAPMEXT242)
+            // set the right value to the ECI (see PAYLAPMEXT257)
             String eci = paymentDetails.getEciIndicator();
-            if (GooglePayUtils.isEmpty(eci) || "5".equalsIgnoreCase(eci)){
+            if (VISA.equalsIgnoreCase(brand) && GooglePayUtils.isEmpty(eci)) {
+                eci = "05";
+            } else if (MASTERCARD.equalsIgnoreCase(brand)
+                    && (GooglePayUtils.isEmpty(eci) || Integer.parseInt(eci) == 5)) {
                 eci = "02";
             }
 

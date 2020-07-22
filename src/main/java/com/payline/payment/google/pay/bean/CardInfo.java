@@ -7,6 +7,8 @@ import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_CARD_
 import static com.payline.payment.google.pay.utils.GooglePayConstants.BEAN_CARD_NETWORK;
 
 public class CardInfo {
+    public static final String VISA = "VISA";
+    public static final String MASTERCARD = "MASTERCARD";
 
     private String cardNetwork;
     private String cardDetails;
