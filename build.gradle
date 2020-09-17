@@ -3,7 +3,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id "com.github.johnrengelman.shadow" version "2.0.1"
-    id "org.sonarqube" version "2.6.1"
+    id "org.sonarqube" version "2.7"
     id "org.owasp.dependencycheck" version "5.2.2"
 }
 
@@ -152,3 +152,9 @@ task testJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
 }
 
 test.exclude '**/*IT.class'
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}

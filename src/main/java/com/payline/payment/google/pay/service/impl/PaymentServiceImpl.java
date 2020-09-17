@@ -26,7 +26,9 @@ import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
 public class PaymentServiceImpl implements PaymentService {
 
     private static final Logger LOGGER = LogManager.getLogger(PaymentServiceImpl.class);
-    /** Indique que le numero de carte transité par google pay est un PAN et non un TOKEN PAN */
+    /**
+     * Indique que le numero de carte transité par google pay est un PAN et non un TOKEN PAN
+     */
     private static final String METHOD_PAN_ONLY = "PAN_ONLY";
 
     @Override
@@ -36,15 +38,15 @@ public class PaymentServiceImpl implements PaymentService {
             String brand = null;
             String holder = null;
             // check if the payment is in direct Mode
-            if (paymentRequest.getPaymentFormContext().getPaymentFormParameter().containsKey(PAYMENTDATA_TOKENDATA)){
+            if (paymentRequest.getPaymentFormContext().getPaymentFormParameter().containsKey(PAYMENTDATA_TOKENDATA)) {
                 token = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENTDATA_TOKENDATA);
-            }else{
+            } else {
                 String jsonPaymentData = paymentRequest.getPaymentFormContext().getPaymentFormParameter().get(PAYMENT_REQUEST_PAYMENT_DATA_KEY);
                 PaymentData paymentData = new PaymentData.Builder().fromJson(jsonPaymentData);
                 token = paymentData.getPaymentMethodData().getTokenizationData().getToken();
                 brand = paymentData.getPaymentMethodData().getInfo().getCardNetwork();
                 holder = paymentData.getPaymentMethodData().getInfo().getBillingAddress().getName();
-                if(holder == null){
+                if (holder == null) {
                     holder = "";
                 }
             }
@@ -93,7 +95,7 @@ public class PaymentServiceImpl implements PaymentService {
             LOGGER.error("An error occured tring to decrypt data", e);
             return PaymentResponseFailure.PaymentResponseFailureBuilder.aPaymentResponseFailure()
                     .withPartnerTransactionId(paymentRequest.getTransactionId())
-                    .withErrorCode("expired payload")
+                    .withErrorCode(e.getMessage())
                     .withFailureCause(FailureCause.SESSION_EXPIRED)
                     .build();
         }
