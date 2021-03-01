@@ -180,4 +180,6 @@ public class GooglePayConstants {
 
     // Data used in PaymentService
     public static final String PAYMENTDATA_TOKENDATA = "PAYMENTDATA_TOKENDATA";
+
+    private GooglePayConstants(){}
 }

@@ -61,7 +61,7 @@ public class PaymentFormConfigurationServiceImplTest {
         Assert.assertFalse(script.contains(JS_PARAM_TAG_CALLBACK));
 
         InputStream stream = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("init.js");
-        String expectedJs = GooglePayUtils.ConvertInputStreamToString(stream);
+        String expectedJs = GooglePayUtils.convertInputStreamToString(stream);
 
         Assert.assertEquals(expectedJs, script);
     }

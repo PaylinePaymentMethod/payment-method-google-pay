@@ -1,5 +1,6 @@
 package com.payline.payment.google.pay.service.impl;
 
+import com.google.crypto.tink.apps.paymentmethodtoken.PaymentMethodTokenRecipient;
 import com.payline.payment.google.pay.utils.Utils;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.payment.response.PaymentModeCard;
@@ -17,6 +18,8 @@ import java.security.GeneralSecurityException;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENTDATA_TOKENDATA;
 import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENT_REQUEST_PAYMENT_DATA_KEY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -158,6 +161,25 @@ public class PaymentServiceImplTest {
         Assert.assertEquals(PAN, modeCard.getCard().getPan());
         Assert.assertEquals(BRAND_VISA, modeCard.getCard().getBrand());
         Assert.assertEquals("", modeCard.getCard().getHolder());
+    }
+
+    @Test
+    public void testGetDecryptedDataWithInvalidKey()  {
+        String privateKey = "cHJpdmF0ZUtleQ==";
+        String oldPrivateKey = "b2xkUHJpdmF0ZUtleQ==";
+        assertThrows(IllegalArgumentException.class, () -> service.getDecryptedData("myToken", privateKey, oldPrivateKey, true));
+    }
+
+    @Test
+    public void testAddPrivateKeyWithGeneralSecurityException() {
+        final PaymentMethodTokenRecipient.Builder builder = new PaymentMethodTokenRecipient.Builder();
+        assertEquals(builder, service.addPrivateKey(builder, "oldKey", "invalidKey"));
+    }
+
+    @Test
+    public void testAddPrivateKeyWithNullKey() {
+        final PaymentMethodTokenRecipient.Builder builder = new PaymentMethodTokenRecipient.Builder();
+        assertEquals(builder, service.addPrivateKey(builder, "oldKey", null));
     }
 
 }
