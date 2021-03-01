@@ -1,5 +1,7 @@
 package com.payline.payment.google.pay.service.impl;
 
+import com.google.crypto.tink.apps.paymentmethodtoken.GooglePaymentsPublicKeysManager;
+import com.google.crypto.tink.apps.paymentmethodtoken.PaymentMethodTokenRecipient;
 import com.payline.payment.google.pay.bean.DecryptedPaymentData;
 import com.payline.payment.google.pay.bean.DecryptedPaymentMethodDetails;
 import com.payline.payment.google.pay.bean.PaymentData;
@@ -50,14 +52,14 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             // decrypt token
-            String privateKey = paymentRequest.getPartnerConfiguration().getProperty(PRIVATE_KEY_PATH);
-            String privateKeyOld = paymentRequest.getPartnerConfiguration().getProperty(OLD_PRIVATE_KEY_PATH);
-            String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, privateKeyOld, paymentRequest.getEnvironment().isSandbox());
-            DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
-            DecryptedPaymentMethodDetails paymentDetails = decryptedPaymentData.getPaymentMethodDetails();
+            final String privateKey = paymentRequest.getPartnerConfiguration().getProperty(PRIVATE_KEY_PATH);
+            final String privateKeyOld = paymentRequest.getPartnerConfiguration().getProperty(OLD_PRIVATE_KEY_PATH);
+            final String jsonEncryptedPaymentData = getDecryptedData(token, privateKey, privateKeyOld, paymentRequest.getEnvironment().isSandbox());
+            final DecryptedPaymentData decryptedPaymentData = new DecryptedPaymentData.Builder().fromJson(jsonEncryptedPaymentData);
+            final DecryptedPaymentMethodDetails paymentDetails = decryptedPaymentData.getPaymentMethodDetails();
 
             // create card from decrypted data
-            Card card = Card.CardBuilder.aCard()
+            final Card card = Card.CardBuilder.aCard()
                     .withBrand(brand)
                     .withHolder(holder)
                     .withExpirationDate(YearMonth.of(paymentDetails.getExpirationYear(), paymentDetails.getExpirationMonth()))
@@ -74,12 +76,12 @@ public class PaymentServiceImpl implements PaymentService {
                 eci = "02";
             }
 
-            PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()
+            final PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()
                     .withCavv(paymentDetails.getCryptogram())
                     .withEci(eci)
                     .build();
 
-            PaymentModeCard paymentModeCard = PaymentModeCard.PaymentModeCardBuilder.aPaymentModeCard()
+            final PaymentModeCard paymentModeCard = PaymentModeCard.PaymentModeCardBuilder.aPaymentModeCard()
                     .withPaymentDatas3DS(paymentData3DS)
                     .withCard(card)
                     .build();
@@ -101,7 +103,28 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     public String getDecryptedData(String token, String privateKey, String privateKeyOld, boolean isSandbox) throws GeneralSecurityException {
-        return GooglePayUtils.decryptFromGoogle(token, privateKey, privateKeyOld, isSandbox);
+        final GooglePaymentsPublicKeysManager keysManager = isSandbox ? GooglePaymentsPublicKeysManager.INSTANCE_TEST : GooglePaymentsPublicKeysManager.INSTANCE_PRODUCTION;
+        keysManager.refreshInBackground();
+
+        PaymentMethodTokenRecipient.Builder builder = new PaymentMethodTokenRecipient.Builder()
+                .fetchSenderVerifyingKeysWith(keysManager)
+                .recipientId("gateway:" + JS_PARAM_VALUE_GATEWAY_NAME)
+                // Multiple private keys can be added to support graceful key rotations.
+                .protocolVersion("ECv2");
+        builder = addPrivateKey(builder, "key", privateKey);
+        builder = addPrivateKey(builder, "oldKey", privateKeyOld);
+        return builder.build().unseal(token);
+    }
+
+    protected PaymentMethodTokenRecipient.Builder addPrivateKey(PaymentMethodTokenRecipient.Builder builder, final String name, final String privateKey) {
+        try{
+            if (!GooglePayUtils.isEmpty(privateKey)) {
+                builder = builder.addRecipientPrivateKey(privateKey);
+            }
+        } catch (GeneralSecurityException exception) {
+            LOGGER.error("Impossible d'ajouter la clé {}", name, exception);
+        }
+        return builder;
     }
 
 }

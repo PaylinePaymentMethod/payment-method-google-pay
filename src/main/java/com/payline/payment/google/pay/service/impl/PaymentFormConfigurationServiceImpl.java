@@ -151,7 +151,7 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
 
         // get the .js file
         InputStream stream = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(JS_RES_INIT_PAYMENT);
-        String rawScriptInitPaymentContent = GooglePayUtils.ConvertInputStreamToString(stream);
+        String rawScriptInitPaymentContent = GooglePayUtils.convertInputStreamToString(stream);
 
         return rawScriptInitPaymentContent
                 .replace(JS_PARAM_TAG_PAYMENTMETHOD_TYPE, paymentMethodType)
