@@ -35,7 +35,7 @@ if (file(externalFileName).exists()) {
 
 
 ext {
-    paymentMethodApiVersion = '1.12-SNAPSHOT'
+    paymentMethodApiVersion = '1.14'
     paymentMethodIntegrationVersion = '1.2'
     mockitoVersion = '2.19.0'
     releaseDirectoryPath = 'D:/build'
