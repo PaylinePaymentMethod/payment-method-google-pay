@@ -1,31 +1,44 @@
 package com.payline.payment.google.pay.service.impl;
 
-import com.payline.payment.google.pay.service.ThalesPaymentFormConfigurationService;
+import com.payline.payment.google.pay.exception.PluginException;
 import com.payline.payment.google.pay.utils.GooglePayUtils;
 import com.payline.payment.google.pay.utils.InvalidDataException;
 import com.payline.payment.google.pay.utils.i18n.I18nService;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.ContractProperty;
+import com.payline.pmapi.bean.paymentform.bean.PaymentFormLogo;
 import com.payline.pmapi.bean.paymentform.bean.form.PartnerWidgetForm;
 import com.payline.pmapi.bean.paymentform.bean.form.partnerwidget.PartnerWidgetContainerTargetDivId;
 import com.payline.pmapi.bean.paymentform.bean.form.partnerwidget.PartnerWidgetOnPayCallBack;
 import com.payline.pmapi.bean.paymentform.bean.form.partnerwidget.PartnerWidgetScriptImport;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormConfigurationRequest;
+import com.payline.pmapi.bean.paymentform.request.PaymentFormLogoRequest;
 import com.payline.pmapi.bean.paymentform.response.configuration.PaymentFormConfigurationResponse;
 import com.payline.pmapi.bean.paymentform.response.configuration.impl.PaymentFormConfigurationResponseFailure;
 import com.payline.pmapi.bean.paymentform.response.configuration.impl.PaymentFormConfigurationResponseSpecific;
+import com.payline.pmapi.bean.paymentform.response.logo.PaymentFormLogoResponse;
+import com.payline.pmapi.bean.paymentform.response.logo.impl.PaymentFormLogoResponseFile;
+import com.payline.pmapi.logger.LogManager;
+import com.payline.pmapi.service.PaymentFormConfigurationService;
+import org.apache.logging.log4j.Logger;
 
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+import static com.payline.payment.google.pay.utils.constants.LogoConstants.*;
 
-public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormConfigurationService {
+public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigurationService {
+
+    private static final Logger LOGGER = LogManager.getLogger(PaymentFormConfigurationServiceImpl.class);
 
     @Override
     public PaymentFormConfigurationResponse getPaymentFormConfiguration(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
@@ -108,11 +121,68 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
             url = new URL(JS_URL_GOOGLE_PAY);
 
         } catch (MalformedURLException e) {
-            this.LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
 
         return url;
 
+    }
+
+    @Override
+    public PaymentFormLogoResponse getPaymentFormLogo(PaymentFormLogoRequest paymentFormLogoRequest) {
+        Properties props = new Properties();
+        try {
+            props = getProprities(props);
+            return PaymentFormLogoResponseFile.PaymentFormLogoResponseFileBuilder.aPaymentFormLogoResponseFile()
+                    .withHeight(Integer.valueOf(props.getProperty(LOGO_HEIGHT)))
+                    .withWidth(Integer.valueOf(props.getProperty(LOGO_WIDTH)))
+                    .withTitle(I18nService.getInstance().getMessage(props.getProperty(LOGO_TITLE), paymentFormLogoRequest.getLocale()))
+                    .withAlt(I18nService.getInstance().getMessage(props.getProperty(LOGO_ALT), paymentFormLogoRequest.getLocale()))
+                    .build();
+        } catch (IOException e) {
+            LOGGER.error("An error occurred reading the file logo.properties", e);
+            throw new PluginException("Failed to reading file logo.properties: ", e);
+
+        }
+    }
+
+    protected Properties getProprities(Properties props) throws IOException {
+        props.load(ConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(LOGO_PROPERTIES));
+        return props;
+    }
+
+    @Override
+    public PaymentFormLogo getLogo(String s, Locale locale) {
+        Properties props = new Properties();
+        try {
+             props =getProprities(props);
+        } catch (IOException e) {
+            LOGGER.error("An error occurred reading the file logo.properties", e);
+            throw new PluginException("An error occurred reading the file logo.properties: ", e);
+
+        }
+        final String fileName = props.getProperty(LOGO_FILE_NAME);
+        try {
+            // Read logo file
+            final BufferedImage logo = getBufferedImage(fileName);
+
+            // Recover byte array from image
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(logo, props.getProperty(LOGO_FORMAT), baos);
+
+            return PaymentFormLogo.PaymentFormLogoBuilder.aPaymentFormLogo()
+                    .withFile(baos.toByteArray())
+                    .withContentType(props.getProperty(LOGO_CONTENT_TYPE))
+                    .build();
+        } catch (IOException e) {
+            LOGGER.error("Unable to load the logo", e);
+            throw new PluginException("Unable to load the logo ", e);
+        }
+    }
+
+    protected BufferedImage getBufferedImage(String fileName) throws IOException {
+        final InputStream input = PaymentFormConfigurationService.class.getClassLoader().getResourceAsStream(fileName);
+        return ImageIO.read(input);
     }
 
     /**
@@ -143,10 +213,8 @@ public class PaymentFormConfigurationServiceImpl implements ThalesPaymentFormCon
         final String buttonType = getValueFromProperties(properties, BUTTON_SIZE_KEY);
         final String buttonColor = getValueFromProperties(properties, BUTTON_COLOR_KEY);
         // verify fields
-        if (!GooglePayUtils.isEmpty(allowedCountry)) {
-            if (!GooglePayUtils.isISO3166(allowedCountry)) {
-                throw new InvalidDataException("allowed Country must be ISO3166 alpha2");
-            }
+        if (!GooglePayUtils.isEmpty(allowedCountry) && !GooglePayUtils.isISO3166(allowedCountry)) {
+            throw new InvalidDataException("allowed Country must be ISO3166 alpha2");
         }
 
         // get the .js file

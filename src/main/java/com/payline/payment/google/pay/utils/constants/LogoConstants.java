@@ -1,4 +1,4 @@
-package com.payline.payment.google.pay.utils.propertiesFilesConstants;
+package com.payline.payment.google.pay.utils.constants;
 
 public class LogoConstants {
 

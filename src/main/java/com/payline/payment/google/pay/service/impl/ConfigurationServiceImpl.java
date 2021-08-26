@@ -1,5 +1,6 @@
 package com.payline.payment.google.pay.service.impl;
 
+import com.payline.payment.google.pay.exception.PluginException;
 import com.payline.payment.google.pay.utils.GooglePayUtils;
 import com.payline.payment.google.pay.utils.i18n.I18nService;
 import com.payline.pmapi.bean.configuration.AvailableNetwork;
@@ -19,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
-import static com.payline.payment.google.pay.utils.propertiesFilesConstants.ConfigurationConstants.*;
+import static com.payline.payment.google.pay.utils.constants.ConfigurationConstants.*;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
 
@@ -145,40 +146,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         networkAmex.setNetwork(AvailableNetwork.AMEX);
         parameters.add(networkAmex);
 
-/*        // not available yet
-        final ListBoxParameter activateNetworkJCB = new ListBoxParameter();
-        activateNetworkJCB.setKey(ACTIVATE_NETWORK_JCB_KEY);
-        activateNetworkJCB.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_JCB_LABEL, locale));
-        activateNetworkJCB.setDescription(this.i18n.getMessage(ACTIVATE_NETWORK_JCB_DESCRIPTION, locale));
-        activateNetworkJCB.setList(yesNoList);
-        activateNetworkJCB.setValue(YES_KEY);
-        activateNetworkJCB.setRequired(true);
-        parameters.add(activateNetworkJCB);
-
-        final NetworkListBoxParameter networkJCB = new NetworkListBoxParameter();
-        networkMastercard.setKey(AvailableNetwork.AMEX.getKey());   // todo AvailableNetwork.JCP
-        networkMastercard.setLabel(this.i18n.getMessage(NETWORK_JCB_LABEL, locale));
-        networkMastercard.setDescription(this.i18n.getMessage(NETWORK_JCB_DESCRIPTION, locale));
-        networkMastercard.setNetwork(AvailableNetwork.AMEX);
-        parameters.add(networkJCB);
-
-        final ListBoxParameter activateNetworkDiscover = new ListBoxParameter();
-        activateNetworkDiscover.setKey(ACTIVATE_NETWORK_DISCOVER_KEY);
-        activateNetworkDiscover.setLabel(this.i18n.getMessage(ACTIVATE_NETWORK_DISCOVER_LABEL, locale));
-        activateNetworkDiscover.sd(this.i18n.getMessage(ACTIVATE_NETWORK_DISCOVER_DESCRIPTION, locale));
-        activateNetworkDiscover.setList(yesNoList);
-        activateNetworkDiscover.setValue(YES_KEY);
-        activateNetworkDiscover.setRequired(true);
-        parameters.add(activateNetworkDiscover);
-
-        final NetworkListBoxParameter networkDiscover = new NetworkListBoxParameter();
-        networkMastercard.setKey(AvailableNetwork.AMEX.getKey());   // todo AvailableNetwork.DISCOVER
-        networkMastercard.setLabel(this.i18n.getMessage(NETWORK_DISCOVER_LABEL, locale));
-        networkMastercard.setDescription(this.i18n.getMessage(NETWORK_DISCOVER_DESCRIPTION, locale));
-        networkMastercard.setNetwork(AvailableNetwork.AMEX);
-        parameters.add(networkDiscover);
-        */
-
         Map<String, String> paymentMethodList = new HashMap<>();
         paymentMethodList.put(CARD_KEY, CARD_VAL);
         final ListBoxParameter paymentMethodType = new ListBoxParameter();
@@ -192,7 +159,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         final InputParameter allowedCountryCode = new InputParameter();
         allowedCountryCode.setKey(ALLOWED_COUNTRY_KEY);
         allowedCountryCode.setLabel(this.i18n.getMessage(ALLOWED_COUNTRY_LABEL, locale));
-        allowedCountryCode.setDescription(this.i18n.getMessage(ALLOWED_COUNTRY_DESCRIPTION, locale));;
+        allowedCountryCode.setDescription(this.i18n.getMessage(ALLOWED_COUNTRY_DESCRIPTION, locale));
         parameters.add(allowedCountryCode);
 
         final ListBoxParameter emailRequired = new ListBoxParameter();
@@ -251,13 +218,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public Map<String, String> check(ContractParametersCheckRequest contractParametersCheckRequest) {
-        Map errors = new HashMap<>();
+        Map<String, String>  errors = new HashMap<>();
         // check if allowedCountry is in ISO3166 range
         String allowedCountry = contractParametersCheckRequest.getAccountInfo().get(ALLOWED_COUNTRY_KEY);
-        if (!GooglePayUtils.isEmpty(allowedCountry)){
-            if (!GooglePayUtils.isISO3166(allowedCountry)){
-                errors.put(ALLOWED_COUNTRY_KEY, i18n.getMessage(ERROR_NOT_ISO3166, contractParametersCheckRequest.getLocale()));
-            }
+        if (!GooglePayUtils.isEmpty(allowedCountry) && !GooglePayUtils.isISO3166(allowedCountry)){
+            errors.put(ALLOWED_COUNTRY_KEY, i18n.getMessage(ERROR_NOT_ISO3166, contractParametersCheckRequest.getLocale()));
         }
 
         // Google pay doesn't provide API to verify fields validity
@@ -272,7 +237,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         } catch (IOException e) {
             final String message = "An error occurred reading the file: release.properties";
             LOGGER.error(message);
-            throw new RuntimeException(message, e);
+            throw new PluginException(message, e);
         }
 
         final LocalDate date = LocalDate.parse(props.getProperty(RELEASE_DATE), DateTimeFormatter.ofPattern(RELEASE_DATE_FORMAT));
