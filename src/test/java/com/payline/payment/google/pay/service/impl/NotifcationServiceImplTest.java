@@ -15,9 +15,4 @@ public class NotifcationServiceImplTest {
         Assert.assertNotNull(response);
         Assert.assertEquals(IgnoreNotificationResponse.class, response.getClass());
     }
-
-    @Test
-    public void notifyTransactionStatus(){
-        service.notifyTransactionStatus(null);
-    }
 }
