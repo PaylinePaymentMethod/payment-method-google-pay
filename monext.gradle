@@ -1,3 +1,4 @@
+import org.gradle.testing.jacoco.plugins.JacocoPlugin
 
 repositories {
     mavenLocal()
@@ -22,10 +23,6 @@ publishing {
         shadow(MavenPublication) { publication ->
             project.shadow.component(publication)
 
-            // For release only
-            if (!project.version.contains('-')) {
-                artifact testJar
-            }
         }
     }
     repositories {
@@ -42,10 +39,19 @@ publishing {
         }
     }
 }
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+plugins.withType(JacocoPlugin) {
+    tasks["test"].finalizedBy 'jacocoTestReport'
+}
 
 sonarqube {
     properties {
-        property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/test.exec"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
         property 'sonar.dependencyCheck.htmlReportPath', "${project.buildDir}/reports/dependency-check-report.html"
     }

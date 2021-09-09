@@ -1,9 +1,12 @@
 package com.payline.payment.google.pay.utils;
 
+import com.google.crypto.tink.apps.paymentmethodtoken.PaymentMethodTokenRecipient;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigInteger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GooglePayUtilsTest {
 
