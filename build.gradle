@@ -63,15 +63,7 @@ dependencies {
     testImplementation "com.payline:payment-method-integration:${paymentMethodIntegrationVersion}"
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.0'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.5.0'
-    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-server', version: '3.141.59'
-    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-support', version: '3.141.59'
 
-    // fatJarTest include testImplementation dependencies (not for IT)
-    fatJarTest group: "junit", name: "junit", version: "4.13.2"
-    fatJarTest group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
-    fatJarTest group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.0'
-    fatJarTest group: 'org.seleniumhq.selenium', name: 'selenium-server', version: '3.141.59'
-    fatJarTest group: 'org.seleniumhq.selenium', name: 'selenium-support', version: '3.141.59'
 }
 
 dependencyCheck {
@@ -92,8 +84,6 @@ shadowJar {
         exclude(dependency('org.apache.logging.log4j:log4j-core:2.13.3'))
         exclude(dependency('org.junit.jupiter:junit-jupiter-params:5.5.0'))
         exclude(dependency('org.junit.jupiter:junit-jupiter-api:5.5.0'))
-        exclude(dependency('org.seleniumhq.selenium:selenium-server:3.141.59'))
-        exclude(dependency('org.seleniumhq.selenium:selenium-support:3.141.59'))
     }
 }
 
@@ -134,14 +124,6 @@ processResources {
                 'date'   : new Date().format("dd/MM/yyyy")
         ])
     }
-}
-
-// To create a JAR including test classes and dependencies
-task testJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    dependsOn 'shadowJar', 'testClasses'
-    classifier = 'tests'
-    from sourceSets.test.output.classesDirs + shadowJar
-    configurations = [project.configurations.fatJarTest]
 }
 
 test.exclude '**/*IT.class'
