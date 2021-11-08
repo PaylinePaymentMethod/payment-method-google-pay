@@ -61,7 +61,7 @@ dependencies {
         transitive = false
     }
 
-    implementation(group: 'com.google.guava', name: 'guava', version: '29.0-jre') {
+    implementation(group: 'com.google.guava', name: 'guava', version: '31.0-jre') {
         transitive = false
     }
 
