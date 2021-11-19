@@ -5,6 +5,7 @@ import com.google.crypto.tink.apps.paymentmethodtoken.PaymentMethodTokenRecipien
 import com.payline.payment.google.pay.bean.DecryptedPaymentData;
 import com.payline.payment.google.pay.bean.DecryptedPaymentMethodDetails;
 import com.payline.payment.google.pay.bean.PaymentData;
+import com.payline.payment.google.pay.exception.PluginException;
 import com.payline.payment.google.pay.utils.GooglePayUtils;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
@@ -30,9 +31,12 @@ public class PaymentServiceImpl implements PaymentService {
     private static final Logger LOGGER = LogManager.getLogger(PaymentServiceImpl.class);
     /** Indique que le numero de carte transité par google pay est un PAN et non un TOKEN PAN */
     private static final String METHOD_PAN_ONLY = "PAN_ONLY";
+    private static final String KEY_NAME = "key";
+    private static final String OLD_KEY_NAME = "oldKey";
 
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
+        PaymentResponse paymentResponse;
         try {
             String token;
             String brand = null;
@@ -67,14 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .withPanType(METHOD_PAN_ONLY.equals(paymentDetails.getAuthMethod()) ? Card.PanType.CARD_PAN : Card.PanType.TOKEN_PAN)
                     .build();
 
-            // set the right value to the ECI (see PAYLAPMEXT257)
-            String eci = paymentDetails.getEciIndicator();
-            if (VISA.equalsIgnoreCase(brand) && GooglePayUtils.isEmpty(eci)) {
-                eci = "05";
-            } else if (MASTERCARD.equalsIgnoreCase(brand)
-                    && (GooglePayUtils.isEmpty(eci) || Integer.parseInt(eci) == 5)) {
-                eci = "02";
-            }
+            final String eci = computeEciIndicator(brand, paymentDetails);
 
             final PaymentData3DS paymentData3DS = PaymentData3DS.Data3DSBuilder.aData3DS()
                     .withCavv(paymentDetails.getCryptogram())
@@ -86,45 +83,91 @@ public class PaymentServiceImpl implements PaymentService {
                     .withCard(card)
                     .build();
 
-            return PaymentResponseDoPayment.PaymentResponseDoPaymentBuilder
+            paymentResponse =  PaymentResponseDoPayment.PaymentResponseDoPaymentBuilder
                     .aPaymentResponseDoPayment()
                     .withPartnerTransactionId(paymentRequest.getTransactionId())
                     .withPaymentMode(paymentModeCard)
                     .build();
-        } catch (GeneralSecurityException e) {
-            LOGGER.error("An error occured tring to decrypt data", e);
-            return PaymentResponseFailure.PaymentResponseFailureBuilder.aPaymentResponseFailure()
+        }
+        catch (final PluginException e) {
+            LOGGER.error(e.getMessage());
+            paymentResponse =  PaymentResponseFailure.PaymentResponseFailureBuilder.aPaymentResponseFailure()
                     .withPartnerTransactionId(paymentRequest.getTransactionId())
-                    .withErrorCode("expired payload")
-                    .withFailureCause(FailureCause.SESSION_EXPIRED)
+                    .withErrorCode(e.getMessage())
+                    .withFailureCause(e.getFailureCause())
+                    .build();
+        }
+        catch (final GeneralSecurityException e) {
+            LOGGER.error("An error occured tring to decrypt data", e);
+            paymentResponse =  PaymentResponseFailure.PaymentResponseFailureBuilder.aPaymentResponseFailure()
+                    .withPartnerTransactionId(paymentRequest.getTransactionId())
+                    .withErrorCode("Unable to decrypt data")
+                    .withFailureCause(FailureCause.INTERNAL_ERROR)
                     .build();
         }
 
+        return paymentResponse;
     }
 
     public String getDecryptedData(String token, String privateKey, String privateKeyOld, boolean isSandbox) throws GeneralSecurityException {
         final GooglePaymentsPublicKeysManager keysManager = isSandbox ? GooglePaymentsPublicKeysManager.INSTANCE_TEST : GooglePaymentsPublicKeysManager.INSTANCE_PRODUCTION;
         keysManager.refreshInBackground();
-
         PaymentMethodTokenRecipient.Builder builder = new PaymentMethodTokenRecipient.Builder()
                 .fetchSenderVerifyingKeysWith(keysManager)
                 .recipientId("gateway:" + JS_PARAM_VALUE_GATEWAY_NAME)
-                // Multiple private keys can be added to support graceful key rotations.
                 .protocolVersion("ECv2");
-        builder = addPrivateKey(builder, "key", privateKey);
-        builder = addPrivateKey(builder, "oldKey", privateKeyOld);
+
+        // Multiple private keys can be added to support graceful key rotations.
+        boolean hasAValidKey = addPrivateKey(builder, KEY_NAME, privateKey) || addPrivateKey(builder, OLD_KEY_NAME, privateKeyOld);
+        if (!hasAValidKey) {
+            throw new PluginException("No valid key to communicate with GooglePay");
+        }
         return builder.build().unseal(token);
     }
 
-    protected PaymentMethodTokenRecipient.Builder addPrivateKey(PaymentMethodTokenRecipient.Builder builder, final String name, final String privateKey) {
+    /**
+     * Méthode permettant d'ajouter une clé privée pour tenter de déchiffrer le message GooglePay.
+     * @param builder
+     *          Builder google utilisé pour le déchiffrement.
+     * @param name
+     *          Nom de la clé.
+     * @param privateKey
+     *          Clé version texte.
+     * @return
+     *          True si la clé a été ajouté false sinon.
+     */
+    protected boolean addPrivateKey(PaymentMethodTokenRecipient.Builder builder, final String name, final String privateKey) {
+        boolean validKey = false;
         try{
             if (!GooglePayUtils.isEmpty(privateKey)) {
-                builder = builder.addRecipientPrivateKey(privateKey);
+                builder.addRecipientPrivateKey(privateKey);
+                validKey = true;
             }
-        } catch (GeneralSecurityException exception) {
+        }
+        catch (final GeneralSecurityException exception) {
             LOGGER.error("Impossible d'ajouter la clé {}", name, exception);
         }
-        return builder;
+        return validKey;
     }
 
+    /**
+     * Method used to compute EciIndicator.
+     * @param brand
+     *          card brand.
+     * @param paymentDetails
+     *          payment details.
+     * @return
+     *          Electronic challenge indicator.
+     */
+    private String computeEciIndicator(final String brand, final DecryptedPaymentMethodDetails paymentDetails) {
+        // set the right value to the ECI (see PAYLAPMEXT257)
+        String eci = paymentDetails.getEciIndicator();
+        if (VISA.equalsIgnoreCase(brand) && GooglePayUtils.isEmpty(eci)) {
+            eci = "05";
+        } else if (MASTERCARD.equalsIgnoreCase(brand)
+                && (GooglePayUtils.isEmpty(eci) || Integer.parseInt(eci) == 5)) {
+            eci = "02";
+        }
+        return eci;
+    }
 }
