@@ -1,7 +1,9 @@
 package com.payline.payment.google.pay.service.impl;
 
 import com.google.crypto.tink.apps.paymentmethodtoken.PaymentMethodTokenRecipient;
+import com.payline.payment.google.pay.exception.PluginException;
 import com.payline.payment.google.pay.utils.Utils;
+import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.payment.response.PaymentModeCard;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
@@ -18,6 +20,8 @@ import java.security.GeneralSecurityException;
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENTDATA_TOKENDATA;
 import static com.payline.payment.google.pay.utils.GooglePayConstants.PAYMENT_REQUEST_PAYMENT_DATA_KEY;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
@@ -29,7 +33,7 @@ public class PaymentServiceImplTest {
 
     @Spy
     @InjectMocks
-    private PaymentServiceImpl service = new PaymentServiceImpl();
+    private PaymentServiceImpl underTest = new PaymentServiceImpl();
 
     private static final String GOOD_PAYMENT_DATA = "{\"apiVersionMinor\":0,\"apiVersion\":2,\"paymentMethodData\":{\"description\":\"Visa •••• 5555\",\"tokenizationData\":{\"type\":\"PAYMENT_GATEWAY\",\"token\":\"{\\\"signature\\\":\\\"MEUCIQD95mdvMXJ2487P0kRF9FQ+nmqrOK0ZlV9ACsp46Um3lgIgYlBCZmBwGpn6J5DbNxSeDwHm+EbqM3wJpe9tVvvAEzs\\\\u003d\\\",\\\"protocolVersion\\\":\\\"ECv1\\\",\\\"signedMessage\\\":\\\"{\\\\\\\"encryptedMessage\\\\\\\":\\\\\\\"P4URAUuCT3h2JFdcFOnK74TTiEIVbWKTauPWyE0BxJEYCdiefH5l7FSmpoo726jpktGWv7yWdecQucilV5LW7/DWJuY49hsExtRuo/0YCasPmX5rWyctvqs417VuztdWujmNJJceedQi9H/yhoGY/YFAWicwj/+OlwgBeY8FkmEeEbXtPdrB6cxwVRiE0OBtPAXywnjpre8jpYmh7EdaJIv22a8OTiY2b8n1eKYZcH51abztPwQlt4IpJucAOrs9gtgdcoFIYRE85JvmFQC2y5PgRVJW8/2d6g+XFDQW+JDSvoIrwfG56h/zP/UInaXKOb3/y7PMjuXIrtlTNq+WAnYFKBBvwEpWIFz6N1uMWcYYuK/W6HnmZARV0KSKfDBK8HBOx0j+FyfS8GoWOlxQbOPTjK1hgoMV2H3MPkDIsChpg9tg/rB6X69dTdUASzLdMqHWaGol8FK5PK20\\\\\\\",\\\\\\\"ephemeralPublicKey\\\\\\\":\\\\\\\"BBFkSPgb6C91NzTup2xB5ug+NjpbMDw/SYOZg9F22C0M0RUGd3KdLONGUpIUCtt5O19Bbwc5V/I96WQShiQwYr0\\\\\\\\u003d\\\\\\\",\\\\\\\"tag\\\\\\\":\\\\\\\"EjygRTxM019BhCt4OEyDWEbSjmYl0mjBOuJ4DrpzXT0\\\\\\\\u003d\\\\\\\"}\\\"}\"},\"type\":\"CARD\",\"info\":{\"cardNetwork\":\"VISA\",\"cardDetails\":\"5555\",\"billingAddress\":{\"phoneNumber\":\"+33 6 66 66 66 66\",\"countryCode\":\"FR\",\"postalCode\":\"75000\",\"name\":\"Jean JEAN\"}}},\"shippingAddress\":{\"address3\":\"\",\"sortingCode\":\"\",\"address2\":\"\",\"countryCode\":\"FR\",\"address1\":\"1 rue de la République\",\"postalCode\":\"75000\",\"name\":\"Jean JEAN\",\"locality\":\"Paris\",\"administrativeArea\":\"\"},\"email\":\"jeanjean@gmail.com\"}";
     private static final String GOOD_PAYMENT_DATA_MC = "{\"apiVersionMinor\":0,\"apiVersion\":2,\"paymentMethodData\":{\"description\":\"Visa •••• 5555\",\"tokenizationData\":{\"type\":\"PAYMENT_GATEWAY\",\"token\":\"{\\\"signature\\\":\\\"MEUCIQD95mdvMXJ2487P0kRF9FQ+nmqrOK0ZlV9ACsp46Um3lgIgYlBCZmBwGpn6J5DbNxSeDwHm+EbqM3wJpe9tVvvAEzs\\\\u003d\\\",\\\"protocolVersion\\\":\\\"ECv1\\\",\\\"signedMessage\\\":\\\"{\\\\\\\"encryptedMessage\\\\\\\":\\\\\\\"P4URAUuCT3h2JFdcFOnK74TTiEIVbWKTauPWyE0BxJEYCdiefH5l7FSmpoo726jpktGWv7yWdecQucilV5LW7/DWJuY49hsExtRuo/0YCasPmX5rWyctvqs417VuztdWujmNJJceedQi9H/yhoGY/YFAWicwj/+OlwgBeY8FkmEeEbXtPdrB6cxwVRiE0OBtPAXywnjpre8jpYmh7EdaJIv22a8OTiY2b8n1eKYZcH51abztPwQlt4IpJucAOrs9gtgdcoFIYRE85JvmFQC2y5PgRVJW8/2d6g+XFDQW+JDSvoIrwfG56h/zP/UInaXKOb3/y7PMjuXIrtlTNq+WAnYFKBBvwEpWIFz6N1uMWcYYuK/W6HnmZARV0KSKfDBK8HBOx0j+FyfS8GoWOlxQbOPTjK1hgoMV2H3MPkDIsChpg9tg/rB6X69dTdUASzLdMqHWaGol8FK5PK20\\\\\\\",\\\\\\\"ephemeralPublicKey\\\\\\\":\\\\\\\"BBFkSPgb6C91NzTup2xB5ug+NjpbMDw/SYOZg9F22C0M0RUGd3KdLONGUpIUCtt5O19Bbwc5V/I96WQShiQwYr0\\\\\\\\u003d\\\\\\\",\\\\\\\"tag\\\\\\\":\\\\\\\"EjygRTxM019BhCt4OEyDWEbSjmYl0mjBOuJ4DrpzXT0\\\\\\\\u003d\\\\\\\"}\\\"}\"},\"type\":\"CARD\",\"info\":{\"cardNetwork\":\"MASTERCARD\",\"cardDetails\":\"5555\",\"billingAddress\":{\"phoneNumber\":\"+33 6 66 66 66 66\",\"countryCode\":\"FR\",\"postalCode\":\"75000\",\"name\":\"Jean JEAN\"}}},\"shippingAddress\":{\"address3\":\"\",\"sortingCode\":\"\",\"address2\":\"\",\"countryCode\":\"FR\",\"address1\":\"1 rue de la République\",\"postalCode\":\"75000\",\"name\":\"Jean JEAN\",\"locality\":\"Paris\",\"administrativeArea\":\"\"},\"email\":\"jeanjean@gmail.com\"}";
@@ -49,137 +53,150 @@ public class PaymentServiceImplTest {
 
     @Test
     public void paymentRequestWithoutEciVISA() throws GeneralSecurityException {
-        PaymentRequest request = Utils.createCompletePaymentBuilder().build();
+        final PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
 
-        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
+        doReturn(GOOD_RESPONSE_DATA).when(underTest).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
 
-        PaymentResponse response = service.paymentRequest(request);
+        final PaymentResponse response = underTest.paymentRequest(request);
 
-        Assert.assertNotNull(response);
+        assertNotNull(response);
         Assert.assertEquals(PaymentResponseDoPayment.class, response.getClass());
-        PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
+        final PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
         Assert.assertEquals(PaymentModeCard.class, responseDoPayment.getPaymentMode().getClass());
         PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
 
-        Assert.assertEquals(PAN, modeCard.getCard().getPan());
-        Assert.assertEquals(BRAND_VISA, modeCard.getCard().getBrand());
-        Assert.assertEquals(NAME, modeCard.getCard().getHolder());
-        Assert.assertEquals("05", modeCard.getPaymentData3DS().getEci());
+        assertEquals(PAN, modeCard.getCard().getPan());
+        assertEquals(BRAND_VISA, modeCard.getCard().getBrand());
+        assertEquals(NAME, modeCard.getCard().getHolder());
+        assertEquals("05", modeCard.getPaymentData3DS().getEci());
     }
 
     @Test
     public void paymentRequestWithoutEciMasterCard() throws GeneralSecurityException {
-        PaymentRequest request = Utils.createCompletePaymentBuilder().build();
+        final PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA_MC);
 
-        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
+        doReturn(GOOD_RESPONSE_DATA).when(underTest).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
 
-        PaymentResponse response = service.paymentRequest(request);
+        final PaymentResponse response = underTest.paymentRequest(request);
 
-        Assert.assertNotNull(response);
+        assertNotNull(response);
         Assert.assertEquals(PaymentResponseDoPayment.class, response.getClass());
-        PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
+        final PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
         Assert.assertEquals(PaymentModeCard.class, responseDoPayment.getPaymentMode().getClass());
-        PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
+        final PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
 
-        Assert.assertEquals(PAN, modeCard.getCard().getPan());
-        Assert.assertEquals(BRAND_MC, modeCard.getCard().getBrand());
-        Assert.assertEquals(NAME, modeCard.getCard().getHolder());
-        Assert.assertEquals("02", modeCard.getPaymentData3DS().getEci());
+        assertEquals(PAN, modeCard.getCard().getPan());
+        assertEquals(BRAND_MC, modeCard.getCard().getBrand());
+        assertEquals(NAME, modeCard.getCard().getHolder());
+        assertEquals("02", modeCard.getPaymentData3DS().getEci());
     }
 
     @Test
     public void paymentRequestWithECI() throws GeneralSecurityException {
-        PaymentRequest request = Utils.createCompletePaymentBuilder().build();
+        final  PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
 
-        doReturn(GOOD_RESPONSE_DATA_WITH_ECI).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
+        doReturn(GOOD_RESPONSE_DATA_WITH_ECI).when(underTest).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
 
-        PaymentResponse response = service.paymentRequest(request);
+        final PaymentResponse response = underTest.paymentRequest(request);
 
-        Assert.assertNotNull(response);
-        Assert.assertEquals(PaymentResponseDoPayment.class, response.getClass());
-        PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
-        Assert.assertEquals(PaymentModeCard.class, responseDoPayment.getPaymentMode().getClass());
-        PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
+        assertNotNull(response);
+        assertEquals(PaymentResponseDoPayment.class, response.getClass());
+        final PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
+        assertEquals(PaymentModeCard.class, responseDoPayment.getPaymentMode().getClass());
+        final PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
 
-        Assert.assertEquals(PAN, modeCard.getCard().getPan());
-        Assert.assertEquals(BRAND_VISA, modeCard.getCard().getBrand());
-        Assert.assertEquals(NAME, modeCard.getCard().getHolder());
-        Assert.assertEquals(ECI, modeCard.getPaymentData3DS().getEci());
+        assertEquals(PAN, modeCard.getCard().getPan());
+        assertEquals(BRAND_VISA, modeCard.getCard().getBrand());
+        assertEquals(NAME, modeCard.getCard().getHolder());
+        assertEquals(ECI, modeCard.getPaymentData3DS().getEci());
     }
-
 
     @Test
     public void paymentRequestDirectMode() throws GeneralSecurityException {
-        PaymentRequest request = Utils.createCompletePaymentBuilder().build();
+        final PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENTDATA_TOKENDATA, DIRECT_MESSAGE);
 
-        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
+        doReturn(GOOD_RESPONSE_DATA).when(underTest).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
 
-        PaymentResponse response = service.paymentRequest(request);
+        final PaymentResponse response = underTest.paymentRequest(request);
 
-        Assert.assertNotNull(response);
-        Assert.assertEquals(PaymentResponseDoPayment.class, response.getClass());
-        PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
-        Assert.assertEquals(PaymentModeCard.class, responseDoPayment.getPaymentMode().getClass());
-        PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
+        assertNotNull(response);
+        assertEquals(PaymentResponseDoPayment.class, response.getClass());
+        final PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
+        assertEquals(PaymentModeCard.class, responseDoPayment.getPaymentMode().getClass());
+        final PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
 
-        Assert.assertEquals(PAN, modeCard.getCard().getPan());
+        assertEquals(PAN, modeCard.getCard().getPan());
     }
 
 
     @Test
     public void paymentRequestKO() throws GeneralSecurityException {
-        PaymentRequest request = Utils.createCompletePaymentBuilder().build();
+        final PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
 
 
-        doThrow(new GeneralSecurityException()).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
-        PaymentResponse response = service.paymentRequest(request);
+        doThrow(new GeneralSecurityException()).when(underTest).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
+        final PaymentResponse response = underTest.paymentRequest(request);
 
-        Assert.assertNotNull(response);
-        Assert.assertEquals(PaymentResponseFailure.class, response.getClass());
+        assertNotNull(response);
+        assertEquals(PaymentResponseFailure.class, response.getClass());
     }
 
     @Test
     public void paymentRequestNoBuyer() throws GeneralSecurityException {
-        PaymentRequest request = Utils.createCompletePaymentBuilder().build();
+        final PaymentRequest request = Utils.createCompletePaymentBuilder().build();
         request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, LIGHT_PAYMENT_DATA);
 
-        doReturn(GOOD_RESPONSE_DATA).when(service).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
+        doReturn(GOOD_RESPONSE_DATA).when(underTest).getDecryptedData(anyString(), anyString(), any(), anyBoolean());
 
-        PaymentResponse response = service.paymentRequest(request);
+        final PaymentResponse response = underTest.paymentRequest(request);
 
-        Assert.assertNotNull(response);
-        Assert.assertEquals(PaymentResponseDoPayment.class, response.getClass());
-        PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
-        Assert.assertEquals(PaymentModeCard.class, responseDoPayment.getPaymentMode().getClass());
-        PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
+        assertNotNull(response);
+        assertEquals(PaymentResponseDoPayment.class, response.getClass());
+        final PaymentResponseDoPayment responseDoPayment = (PaymentResponseDoPayment) response;
+        assertEquals(PaymentModeCard.class, responseDoPayment.getPaymentMode().getClass());
+        final PaymentModeCard modeCard = (PaymentModeCard) responseDoPayment.getPaymentMode();
 
-        Assert.assertEquals(PAN, modeCard.getCard().getPan());
-        Assert.assertEquals(BRAND_VISA, modeCard.getCard().getBrand());
-        Assert.assertEquals("", modeCard.getCard().getHolder());
+        assertEquals(PAN, modeCard.getCard().getPan());
+        assertEquals(BRAND_VISA, modeCard.getCard().getBrand());
+        assertEquals("", modeCard.getCard().getHolder());
     }
 
     @Test
     public void testGetDecryptedDataWithInvalidKey()  {
-        String privateKey = "cHJpdmF0ZUtleQ==";
-        String oldPrivateKey = "b2xkUHJpdmF0ZUtleQ==";
-        assertThrows(IllegalArgumentException.class, () -> service.getDecryptedData("myToken", privateKey, oldPrivateKey, true));
+        final String privateKey = "cHJpdmF0ZUtleQ==";
+        final String oldPrivateKey = "b2xkUHJpdmF0ZUtleQ==";
+        assertThrows(PluginException.class, () -> underTest.getDecryptedData("myToken", privateKey, oldPrivateKey, true));
     }
 
     @Test
     public void testAddPrivateKeyWithGeneralSecurityException() {
         final PaymentMethodTokenRecipient.Builder builder = new PaymentMethodTokenRecipient.Builder();
-        assertEquals(builder, service.addPrivateKey(builder, "oldKey", "invalidKey"));
+        assertFalse(underTest.addPrivateKey(builder, "oldKey", "invalidKey"));
     }
 
     @Test
     public void testAddPrivateKeyWithNullKey() {
         final PaymentMethodTokenRecipient.Builder builder = new PaymentMethodTokenRecipient.Builder();
-        assertEquals(builder, service.addPrivateKey(builder, "oldKey", null));
+        assertFalse(underTest.addPrivateKey(builder, "oldKey", null));
     }
 
+    @Test
+    public void testWithInvalidKey() {
+        final PaymentRequest request = Utils.createCompletePaymentBuilder().build();
+        request.getPaymentFormContext().getPaymentFormParameter().put(PAYMENT_REQUEST_PAYMENT_DATA_KEY, GOOD_PAYMENT_DATA);
+
+        doReturn(false, false).when(underTest).addPrivateKey(any(), anyString(),anyString());
+
+        final PaymentResponse response = underTest.paymentRequest(request);
+        assertNotNull(response);
+        assertEquals(PaymentResponseFailure.class, response.getClass());
+        final PaymentResponseFailure failureResponse = (PaymentResponseFailure) response;
+        assertEquals("No valid key to communicate with GooglePay",failureResponse.getErrorCode());
+        assertEquals(FailureCause.INTERNAL_ERROR, failureResponse.getFailureCause());
+    }
 }
