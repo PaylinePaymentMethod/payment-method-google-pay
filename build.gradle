@@ -14,7 +14,7 @@ apply plugin: 'jacoco'
 
 description = 'payment-method-google-pay'
 group 'com.payline.payment.google-pay'
-version '1.7-SNAPSHOT'
+version '1.7'
 
 
 compileJava.options.encoding = 'UTF-8'
