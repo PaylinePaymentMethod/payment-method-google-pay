@@ -34,11 +34,13 @@ import java.util.*;
 
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+import static com.payline.payment.google.pay.utils.constants.ConfigurationConstants.PAYMENT_METHOD_NAME;
 import static com.payline.payment.google.pay.utils.constants.LogoConstants.*;
 
 public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigurationService {
 
     private static final Logger LOGGER = LogManager.getLogger(PaymentFormConfigurationServiceImpl.class);
+    protected I18nService i18n = I18nService.getInstance();
 
     @Override
     public PaymentFormConfigurationResponse getPaymentFormConfiguration(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
@@ -131,13 +133,14 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
     @Override
     public PaymentFormLogoResponse getPaymentFormLogo(PaymentFormLogoRequest paymentFormLogoRequest) {
         Properties props = new Properties();
+        Locale locale = paymentFormLogoRequest.getLocale();
         try {
             props = getProprities(props);
             return PaymentFormLogoResponseFile.PaymentFormLogoResponseFileBuilder.aPaymentFormLogoResponseFile()
                     .withHeight(Integer.valueOf(props.getProperty(LOGO_HEIGHT)))
                     .withWidth(Integer.valueOf(props.getProperty(LOGO_WIDTH)))
-                    .withTitle(I18nService.getInstance().getMessage(props.getProperty(LOGO_TITLE), paymentFormLogoRequest.getLocale()))
-                    .withAlt(I18nService.getInstance().getMessage(props.getProperty(LOGO_ALT), paymentFormLogoRequest.getLocale()))
+                    .withTitle(i18n.getMessage(PAYMENT_METHOD_NAME, locale))
+                    .withAlt(i18n.getMessage(PAYMENT_METHOD_NAME, locale) + " logo")
                     .build();
         } catch (IOException e) {
             LOGGER.error("An error occurred reading the file logo.properties", e);
