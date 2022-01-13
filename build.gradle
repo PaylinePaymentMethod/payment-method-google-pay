@@ -14,7 +14,7 @@ apply plugin: 'jacoco'
 
 description = 'payment-method-google-pay'
 group 'com.payline.payment.google-pay'
-version '1.8-SNAPSHOT'
+version '1.9'
 
 
 compileJava.options.encoding = 'UTF-8'
@@ -88,8 +88,8 @@ dependencies {
 dependencyCheck {
     format 'ALL'
     cve {
-        urlBase = 'https://jindus.intra.monext.fr/nist-data-mirror/nvdcve-1.0-%d.json.gz'
-        urlModified = 'https://jindus.intra.monext.fr/nist-data-mirror/nvdcve-1.0-modified.json.gz'
+        urlBase = 'https://jindus.intra.monext.fr/nist-data-mirror/nvdcve-1.1-%d.json.gz'
+        urlModified = 'https://jindus.intra.monext.fr/nist-data-mirror/nvdcve-1.1-modified.json.gz'
     }
 }
 
