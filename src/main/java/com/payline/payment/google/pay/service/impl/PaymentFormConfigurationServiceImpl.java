@@ -223,6 +223,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
         // get the .js file
         InputStream stream = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(JS_RES_INIT_PAYMENT);
         String rawScriptInitPaymentContent = GooglePayUtils.convertInputStreamToString(stream);
+        final String noCompatibleCardMessage = I18nService.getInstance().getMessage(NO_COMPATIBLE_CARD_MESSAGE, paymentFormConfigurationRequest.getLocale());
 
         return rawScriptInitPaymentContent
                 .replace(JS_PARAM_TAG_PAYMENTMETHOD_TYPE, paymentMethodType)
@@ -250,7 +251,8 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
                 .replace(JS_PARAM_TAG_BTN_COLOR, buttonColor.toLowerCase())
 
                 .replace(JS_PARAM_TAG_CONTAINER, JS_PARAM_VALUE_CONTAINER)
-                .replace(JS_PARAM_TAG_CALLBACK, JS_PARAM_VALUE_CALLBACK);
+                .replace(JS_PARAM_TAG_CALLBACK, JS_PARAM_VALUE_CALLBACK)
+                .replace(JS_PARAM_TAG_NO_COMPATIBLE_CARD_MESSAGE, noCompatibleCardMessage);
     }
 
     String getValueFromProperties(Map<String, ContractProperty> properties, String key) throws InvalidDataException {
