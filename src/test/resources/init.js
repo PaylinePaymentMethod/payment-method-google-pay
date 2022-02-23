@@ -78,6 +78,9 @@ function onGooglePayLoaded() {
         if (response.result) {
           addGooglePayButton();
            prefetchGooglePaymentData();
+        } else {
+            console.warn("No compatible card for Google Pay available");
+            addNoCompatibleCardMessage();
         }
       })
       .catch(function(err) {
@@ -96,6 +99,11 @@ function addGooglePayButton() {
         onClick: onGooglePaymentButtonClicked
       });
   document.getElementById('paylineGooglePayBtnDivContainer').appendChild(button);
+}
+
+function addNoCompatibleCardMessage() {
+    const div = document.createElement("div").appendChild(document.createTextNode("Google Pay 3D Secure ne peut être utilisé car la carte stockée dans le wallet n'est pas compatible ou le paiement n'est pas effectué depuis un mobile"));
+    document.getElementById('paylineGooglePayBtnDivContainer').appendChild(div);
 }
 
 function getGoogleTransactionInfo() {

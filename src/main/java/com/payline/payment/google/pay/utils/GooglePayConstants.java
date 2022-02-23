@@ -59,6 +59,7 @@ public class GooglePayConstants {
     public static final String JS_PARAM_TAG_PRICE = "${totalPrice}";
     public static final String JS_PARAM_TAG_BTN_COLOR = "${buttonColor}";
     public static final String JS_PARAM_TAG_BTN_TYPE = "${buttonType}";
+    public static final String JS_PARAM_TAG_NO_COMPATIBLE_CARD_MESSAGE = "${noCompatibleCardMessage}";
 
     // data used in PaymentFormConfigurationServiceImpl
     public static final String TEST = "TEST";
@@ -77,6 +78,7 @@ public class GooglePayConstants {
     public static final String ACTIVATE_NETWORK_REGEX = "activateNetwork";
     public static final String PAYMENT_REQUEST_PAYMENT_DATA_KEY = "data";
     public static final String BUTTON_DESCRIPTION = "payment.form.config.description";
+    public static final String NO_COMPATIBLE_CARD_MESSAGE = "payment.form.config.noCompatibleCardMessage";
     public static final String FAILURE_TRANSACTION_ID = "NO TRANSACTION YET";
 
     // data used in ConfigurationService
