@@ -78,6 +78,9 @@ function onGooglePayLoaded() {
         if (response.result) {
           addGooglePayButton();
            prefetchGooglePaymentData();
+        } else {
+            console.warn("No compatible card for Google Pay available");
+            addNoCompatibleCardMessage();
         }
       })
       .catch(function(err) {
@@ -96,6 +99,11 @@ function addGooglePayButton() {
         onClick: onGooglePaymentButtonClicked
       });
   document.getElementById('${container}').appendChild(button);
+}
+
+function addNoCompatibleCardMessage() {
+    const div = document.createElement("div").appendChild(document.createTextNode("${noCompatibleCardMessage}"));
+    document.getElementById('${container}').appendChild(div);
 }
 
 function getGoogleTransactionInfo() {

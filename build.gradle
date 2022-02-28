@@ -7,14 +7,13 @@ plugins {
     id "org.owasp.dependencycheck" version "6.0.1"
 }
 
-apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
 
 description = 'payment-method-google-pay'
 group 'com.payline.payment.google-pay'
-version '1.7'
+version '2.0'
 
 
 compileJava.options.encoding = 'UTF-8'
@@ -28,7 +27,7 @@ if (file(externalFileName).exists()) {
 
 
 ext {
-    paymentMethodApiVersion = '1.14'
+    paymentMethodApiVersion = '1.17'
     paymentMethodIntegrationVersion = '1.4'
     releaseDirectoryPath = 'D:/build'
 }
@@ -88,8 +87,8 @@ dependencies {
 dependencyCheck {
     format 'ALL'
     cve {
-        urlBase = 'https://jindus.intra.monext.fr/nist-data-mirror/nvdcve-1.0-%d.json.gz'
-        urlModified = 'https://jindus.intra.monext.fr/nist-data-mirror/nvdcve-1.0-modified.json.gz'
+        urlBase = 'https://jindus.intra.monext.fr/nist-data-mirror/nvdcve-1.1-%d.json.gz'
+        urlModified = 'https://jindus.intra.monext.fr/nist-data-mirror/nvdcve-1.1-modified.json.gz'
     }
 }
 

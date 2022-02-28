@@ -34,11 +34,13 @@ import java.util.*;
 
 
 import static com.payline.payment.google.pay.utils.GooglePayConstants.*;
+import static com.payline.payment.google.pay.utils.constants.ConfigurationConstants.PAYMENT_METHOD_NAME;
 import static com.payline.payment.google.pay.utils.constants.LogoConstants.*;
 
 public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigurationService {
 
     private static final Logger LOGGER = LogManager.getLogger(PaymentFormConfigurationServiceImpl.class);
+    protected I18nService i18n = I18nService.getInstance();
 
     @Override
     public PaymentFormConfigurationResponse getPaymentFormConfiguration(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
@@ -131,13 +133,14 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
     @Override
     public PaymentFormLogoResponse getPaymentFormLogo(PaymentFormLogoRequest paymentFormLogoRequest) {
         Properties props = new Properties();
+        Locale locale = paymentFormLogoRequest.getLocale();
         try {
             props = getProprities(props);
             return PaymentFormLogoResponseFile.PaymentFormLogoResponseFileBuilder.aPaymentFormLogoResponseFile()
                     .withHeight(Integer.valueOf(props.getProperty(LOGO_HEIGHT)))
                     .withWidth(Integer.valueOf(props.getProperty(LOGO_WIDTH)))
-                    .withTitle(I18nService.getInstance().getMessage(props.getProperty(LOGO_TITLE), paymentFormLogoRequest.getLocale()))
-                    .withAlt(I18nService.getInstance().getMessage(props.getProperty(LOGO_ALT), paymentFormLogoRequest.getLocale()))
+                    .withTitle(i18n.getMessage(PAYMENT_METHOD_NAME, locale))
+                    .withAlt(i18n.getMessage(PAYMENT_METHOD_NAME, locale) + " logo")
                     .build();
         } catch (IOException e) {
             LOGGER.error("An error occurred reading the file logo.properties", e);
@@ -181,7 +184,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
     }
 
     protected BufferedImage getBufferedImage(String fileName) throws IOException {
-        final InputStream input = PaymentFormConfigurationService.class.getClassLoader().getResourceAsStream(fileName);
+        final InputStream input = this.getClass().getClassLoader().getResourceAsStream(fileName);
         return ImageIO.read(input);
     }
 
@@ -220,6 +223,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
         // get the .js file
         InputStream stream = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(JS_RES_INIT_PAYMENT);
         String rawScriptInitPaymentContent = GooglePayUtils.convertInputStreamToString(stream);
+        final String noCompatibleCardMessage = I18nService.getInstance().getMessage(NO_COMPATIBLE_CARD_MESSAGE, paymentFormConfigurationRequest.getLocale());
 
         return rawScriptInitPaymentContent
                 .replace(JS_PARAM_TAG_PAYMENTMETHOD_TYPE, paymentMethodType)
@@ -247,7 +251,8 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
                 .replace(JS_PARAM_TAG_BTN_COLOR, buttonColor.toLowerCase())
 
                 .replace(JS_PARAM_TAG_CONTAINER, JS_PARAM_VALUE_CONTAINER)
-                .replace(JS_PARAM_TAG_CALLBACK, JS_PARAM_VALUE_CALLBACK);
+                .replace(JS_PARAM_TAG_CALLBACK, JS_PARAM_VALUE_CALLBACK)
+                .replace(JS_PARAM_TAG_NO_COMPATIBLE_CARD_MESSAGE, noCompatibleCardMessage);
     }
 
     String getValueFromProperties(Map<String, ContractProperty> properties, String key) throws InvalidDataException {

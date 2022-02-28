@@ -127,8 +127,8 @@ public class PaymentFormConfigurationServiceImplTest {
         PaymentFormLogoResponseFile casted = (PaymentFormLogoResponseFile) paymentFormLogoResponse;
         Assert.assertEquals(image.getHeight(), casted.getHeight());
         Assert.assertEquals(image.getWidth(), casted.getWidth());
-        Assert.assertNotNull(casted.getTitle());
-        Assert.assertNotNull(casted.getAlt());
+        Assert.assertEquals(casted.getTitle(),"Google Pay");
+        Assert.assertEquals(casted.getAlt(),"Google Pay logo");
     }
 
     @Test
